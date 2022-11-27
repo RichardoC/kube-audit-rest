@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: kube-audit-rest
+  labels:
+    k8s-app: filebeat
+data:
+  filebeat.yml: |-
+    filebeat.inputs:
+    - type: log
+      paths:
+        - /tmp/*.log
+      json.keys_under_root: false
+      json.add_error_key: true
+
+    
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+
