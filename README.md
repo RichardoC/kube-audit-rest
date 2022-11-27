@@ -63,16 +63,19 @@ The application logs will be full of the following error, and you will *not* get
 
 
 ## Next steps
-* Use flags for certs locations
 * Use structured logging
 * Add local automated testing
 * upload images on git commit
 * make a distroless version
-* add option to write to a file rather than STDOUT with rotation or a max size
 * explain zero stability guarantees until above completed
-* explain how to limit resources it's logging via the webhok resource (just a link to the k8s docs)
+* explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
-* rename to kube-audit-rest or kube-audit
+* rename to kube-audit-rest 
 * make it clear log file only exists if requests are sent
+* clarify log file format is the raw response with no newlines, with one response per line.
+
+## Completed next steps
+* Use flags for certs locations
+* write to a file rather than STDOUT with rotation and/or a max size
