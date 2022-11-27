@@ -48,6 +48,8 @@ This webhook also cannot know that all other validating webhooks passed so may l
 
 Due to the failure:ignore there may be missing requests that were not logged in the interests of availability.
 
+WARNING: This will log all details of the request! This namespace should be very locked down to prevent priviledge escalation!
+
 
 
 ## Next steps
@@ -55,3 +57,5 @@ Due to the failure:ignore there may be missing requests that were not logged in 
 * Use structured logging
 * Add local automated testing
 * upload images on git commit
+* make a distroless version
+* add option to write to a file rather than STDOUT with rotation or a max size
