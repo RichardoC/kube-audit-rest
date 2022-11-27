@@ -2,6 +2,12 @@
 Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with EKS?
 Use kube-rest-audit
 
+## What this is
+A simple logger of requests to the k8s api.
+
+## What this isn't
+A filtering/redaction/forwarder system. That's for the user to do.
+
 ## Deploying
 
 ## Building
