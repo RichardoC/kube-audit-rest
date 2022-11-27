@@ -78,7 +78,7 @@ func main() {
 	// Log out log location, size etc
 
 	auditLogger := &lumberjack.Logger{
-		Filename:   "/tmp/kube-rest-audit.log",
+		Filename:   opts.LoggerFilename,
 		MaxSize:    500, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28,    //days
