@@ -9,7 +9,7 @@ req_extensions = v3_req
 C=GB
 OU=Engineering
 emailAddress=admin@localhost
-CN = kube-rest-audit
+CN = kube-audit-rest
 
 
 [v3_req]
@@ -21,7 +21,7 @@ keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = kube-rest-audit
-DNS.2 = *.kube-rest-audit
-DNS.3 = *.kube-rest-audit.svc
-DNS.4 = *.kube-rest-audit.svc.cluster.local
+DNS.1 = kube-audit-rest
+DNS.2 = *.kube-audit-rest
+DNS.3 = *.kube-audit-rest.svc
+DNS.4 = *.kube-audit-rest.svc.cluster.local

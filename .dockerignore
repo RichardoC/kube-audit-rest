@@ -1,5 +1,5 @@
 # Ignore files not built in docker image
-kube-rest-audit
+kube-audit-rest
 
 # Ignore git directories
 .git

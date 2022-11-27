@@ -67,7 +67,7 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 }
 
 type Options struct {
-	LoggerFilename   string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-rest-audit.log"`
+	LoggerFilename   string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-audit-rest.log"`
 	LoggerMaxSize    int    `long:"logger-max-size" description:"Maximum size for each log file in megabytes" default:"500"`
 	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store" default:"3"`
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`

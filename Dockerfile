@@ -3,7 +3,7 @@ FROM golang@sha256:d171aa333fb386089206252503bc6ab545072670e0286e3d1bbc644362825
 
 RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
-WORKDIR /src/github.com/RichardoC/kube-rest-audit
+WORKDIR /src/github.com/RichardoC/kube-audit-rest
 
 COPY ./go.mod ./go.sum ./
 
@@ -29,10 +29,10 @@ EXPOSE 9090
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=builder /src/github.com/RichardoC/kube-rest-audit/kube-rest-audit /src/github.com/RichardoC/kube-rest-audit/kube-rest-audit
+COPY --from=builder /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest
 
 USER 255999
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
-CMD ["/src/github.com/RichardoC/kube-rest-audit/kube-rest-audit"]
+CMD ["/src/github.com/RichardoC/kube-audit-rest/kube-audit-rest"]

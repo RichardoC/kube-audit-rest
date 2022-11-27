@@ -1,6 +1,6 @@
-# kube-rest-audit
+# kube-audit-rest
 Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with EKS?
-Use kube-rest-audit
+Use kube-audit-rest
 
 ## What this is
 A simple logger of requests to the k8s api.
@@ -24,7 +24,7 @@ Requires nerdctl and rancher desktop as a way of building/testing locally with k
 Run via the Building commands, then the following should contain various admission requests
 
 ```bash
-kubectl -n kube-rest-audit logs -l app=kube-rest-audit 
+kubectl -n kube-audit-rest logs -l app=kube-audit-rest 
 ```
 
 Confirm that the k8s API is happy with this webhook (log location may vary, check Rancher Desktop docs)
@@ -37,9 +37,9 @@ vim $HOME/.local/share/rancher-desktop/logs/k3s.log
 Example failures
 
 ```
-W1127 13:26:10.911971    3402 dispatcher.go:142] Failed calling webhook, failing open kube-rest-audit.kube-rest-audit.svc.cluster.local: failed calling webhook "kube-rest-audit.kube-rest-audit.svc.cluster.local": failed to call webhook: Post "https://kube-rest-audit.kube-rest-audit.svc:443/log-request?timeout=1s": x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "ca.local")
-W1127 13:35:04.936121    3402 dispatcher.go:142] Failed calling webhook, failing open kube-rest-audit.kube-rest-audit.svc.cluster.local: failed calling webhook "kube-rest-audit.kube-rest-audit.svc.cluster.local": failed to call webhook: Post "https://kube-rest-audit.kube-rest-audit.svc:443/log-request?timeout=1s": no endpoints available for service "kube-rest-audit"
-E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-rest-audit.kube-rest-audit.svc.cluster.local": failed to call webhook: Post "https://kube-rest-audit.kube-rest-audit.svc:443/log-request?timeout=1s": no endpoints available for service "kube-rest-audit"
+W1127 13:26:10.911971    3402 dispatcher.go:142] Failed calling webhook, failing open kube-audit-rest.kube-audit-rest.svc.cluster.local: failed calling webhook "kube-audit-rest.kube-audit-rest.svc.cluster.local": failed to call webhook: Post "https://kube-audit-rest.kube-audit-rest.svc:443/log-request?timeout=1s": x509: certificate signed by unknown authority (possibly because of "crypto/rsa: verification error" while trying to verify candidate authority certificate "ca.local")
+W1127 13:35:04.936121    3402 dispatcher.go:142] Failed calling webhook, failing open kube-audit-rest.kube-audit-rest.svc.cluster.local: failed calling webhook "kube-audit-rest.kube-audit-rest.svc.cluster.local": failed to call webhook: Post "https://kube-audit-rest.kube-audit-rest.svc:443/log-request?timeout=1s": no endpoints available for service "kube-audit-rest"
+E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-audit-rest.kube-audit-rest.svc.cluster.local": failed to call webhook: Post "https://kube-audit-rest.kube-audit-rest.svc:443/log-request?timeout=1s": no endpoints available for service "kube-audit-rest"
 
 ```
 

@@ -1,4 +1,4 @@
-module github.com/RichardoC/kube-rest-audit
+module github.com/RichardoC/kube-audit-rest
 
 go 1.19
 

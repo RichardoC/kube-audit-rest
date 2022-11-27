@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kube-rest-audit
+  name: kube-audit-rest
