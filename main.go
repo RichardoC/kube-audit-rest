@@ -119,7 +119,7 @@ func main() {
 		MaxBackups: opts.LoggerMaxBackups,
 	}
 
-	// Required soo http errors structured
+	// Required so http errors structured
 	w := logger.Writer()
 	defer w.Close()
 
