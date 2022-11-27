@@ -2,13 +2,23 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	// Makes it easier to be parsed by elastic search etc
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stderr)
+	log.SetLevel(log.InfoLevel)
+}
 
 const responseTemplate = `{
 	"apiVersion": "admission.k8s.io/v1",
@@ -22,7 +32,7 @@ const responseTemplate = `{
 func logRequest(requestBody []byte, logger *lumberjack.Logger) {
 	_, err := fmt.Fprintf(logger, "%s", requestBody)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 	}
 }
 
@@ -30,8 +40,12 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 	var body []byte
 	// Don't bother with any logic if there is no request
 	if r.Body != nil {
-		if data, err := ioutil.ReadAll(r.Body); err == nil {
+		if data, err := io.ReadAll(r.Body); err == nil {
 			body = data
+		} else {
+			log.Debug(err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
@@ -41,19 +55,19 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 	// verify the content type is accurate
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "application/json" {
-		fmt.Printf("contentType=%s, expect application/json", contentType)
+		log.Debugf("contentType=%s, expect application/json", contentType)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !gjson.ValidBytes(body) {
-		fmt.Printf("invalid json")
+		log.Debug("invalid json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	requestUid := gjson.GetBytes(body, "request.uid").Str
 	if requestUid == "" {
-		fmt.Printf("failed to find request uid")
+		log.Debug("failed to find request uid")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -72,6 +86,7 @@ type Options struct {
 	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store" default:"3"`
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
+	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
 }
 
 func main() {
@@ -79,10 +94,9 @@ func main() {
 	parser := flags.NewParser(&opts, flags.Default)
 	_, err := parser.Parse()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	fmt.Println(opts.LoggerFilename)
-	// Log out log location, size etc
+	log.Infof("Got config %v", opts)
 
 	auditLogger := &lumberjack.Logger{
 		Filename:   opts.LoggerFilename,
@@ -90,9 +104,13 @@ func main() {
 		MaxBackups: opts.LoggerMaxBackups,
 	}
 
+	addr := fmt.Sprintf(":%d", opts.ServerPort)
+	log.WithField("addr", addr).Info("Starting server")
 	http.HandleFunc("/log-request", func(w http.ResponseWriter, r *http.Request) { logRequestHandler(w, r, auditLogger) })
 
-	// log out starting server
-	err = http.ListenAndServeTLS(":9090", opts.CertFilename, opts.CertKeyFilename, nil)
-	panic(err)
+
+
+
+	err = http.ListenAndServeTLS(addr, opts.CertFilename, opts.CertKeyFilename, nil)
+	log.Fatal(err)
 }
