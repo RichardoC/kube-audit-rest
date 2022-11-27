@@ -43,7 +43,7 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 		if data, err := io.ReadAll(r.Body); err == nil {
 			body = data
 		} else {
-			log.Debug(err)
+			log.WithField("body", r.Body).Debug(err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -55,13 +55,13 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 	// verify the content type is accurate
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "application/json" {
-		log.Debugf("contentType=%s, expect application/json", contentType)
+		log.WithField("contentType", contentType).Debugf("expect application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !gjson.ValidBytes(body) {
-		log.Debug("invalid json")
+		log.WithField("body", body).Debug("invalid json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -96,20 +96,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Infof("Got config %v", opts)
+	log.WithField("config", opts).Info("Got config")
 
 	auditLogger := &lumberjack.Logger{
 		Filename:   opts.LoggerFilename,
-		MaxSize:    opts.LoggerMaxSize, // megabytes
+		MaxSize:    opts.LoggerMaxSize,
 		MaxBackups: opts.LoggerMaxBackups,
 	}
 
 	addr := fmt.Sprintf(":%d", opts.ServerPort)
 	log.WithField("addr", addr).Info("Starting server")
 	http.HandleFunc("/log-request", func(w http.ResponseWriter, r *http.Request) { logRequestHandler(w, r, auditLogger) })
-
-
-
 
 	err = http.ListenAndServeTLS(addr, opts.CertFilename, opts.CertKeyFilename, nil)
 	log.Fatal(err)
