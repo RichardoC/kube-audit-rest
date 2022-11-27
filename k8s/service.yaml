@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kube-rest-audit
+  name: kube-rest-audit
+  namespace: kube-rest-audit
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: kube-rest-audit
+  sessionAffinity: None
+  type: ClusterIP
+

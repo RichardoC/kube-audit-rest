@@ -1,0 +1,27 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+req_extensions = v3_req
+
+[dn]
+C=GB
+OU=Engineering
+emailAddress=admin@localhost
+CN = kube-rest-audit
+
+
+[v3_req]
+#authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+
+
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = kube-rest-audit
+DNS.2 = *.kube-rest-audit
+DNS.3 = *.kube-rest-audit.svc
+DNS.4 = *.kube-rest-audit.svc.cluster.local
