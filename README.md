@@ -68,3 +68,4 @@ WARNING: This will log all details of the request! This namespace should be very
 * explain zero stability guarantees until above completed
 * explain how to limit resources it's logging via the webhok resource (just a link to the k8s docs)
 * follow GH best practises for workflows/etc
+* make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
