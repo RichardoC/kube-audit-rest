@@ -65,3 +65,5 @@ WARNING: This will log all details of the request! This namespace should be very
 * upload images on git commit
 * make a distroless version
 * add option to write to a file rather than STDOUT with rotation or a max size
+* explain zero stability guarantees until above completed
+* explain how to limit resources it's logging via the webhok resource (just a link to the k8s docs)
