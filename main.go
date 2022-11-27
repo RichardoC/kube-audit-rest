@@ -20,7 +20,10 @@ const responseTemplate = `{
 }`
 
 func logRequest(requestBody []byte, logger *lumberjack.Logger) {
-	fmt.Fprintf(logger, "%s", requestBody)
+	_, err := fmt.Fprintf(logger, "%s", requestBody)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjack.Logger) {
@@ -64,7 +67,11 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, logger *lumberjac
 }
 
 type Options struct {
-	LoggerFilename string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-rest-audit.log"`
+	LoggerFilename   string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-rest-audit.log"`
+	LoggerMaxSize    int    `long:"logger-max-size" description:"Maximum size for each log file in megabytes" default:"500"`
+	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store" default:"3"`
+	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
+	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 }
 
 func main() {
@@ -79,17 +86,13 @@ func main() {
 
 	auditLogger := &lumberjack.Logger{
 		Filename:   opts.LoggerFilename,
-		MaxSize:    500, // megabytes
-		MaxBackups: 3,
-		MaxAge:     28,    //days
-		Compress:   false, // disabled by default
+		MaxSize:    opts.LoggerMaxSize, // megabytes
+		MaxBackups: opts.LoggerMaxBackups,
 	}
 
 	http.HandleFunc("/log-request", func(w http.ResponseWriter, r *http.Request) { logRequestHandler(w, r, auditLogger) })
 
-	// TODO have these be flags to a location
-	certFile := "/etc/tls/tls.crt"
-	keyFile := "/etc/tls/tls.key"
 	// log out starting server
-	http.ListenAndServeTLS(":9090", certFile, keyFile, nil)
+	err = http.ListenAndServeTLS(":9090", opts.CertFilename, opts.CertKeyFilename, nil)
+	panic(err)
 }
