@@ -5,19 +5,11 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 
 WORKDIR /src/github.com/RichardoC/kube-rest-audit
 
-COPY ./src/go.mod ./src/go.sum ./
-
-# RUN apk add --no-cache curl wget gcc make bash git musl-dev libc6-compat gettext
-
-# RUN touch /root/.profile
-
-# WORKDIR /go/github.com/thought-machine/prometheus-cardinality-exporter
+COPY ./go.mod ./go.sum ./
 
 RUN go mod download
 
 COPY . .
-
-WORKDIR /src/github.com/RichardoC/kube-rest-audit/src
 
 # TODO add tests and uncomment
 # RUN CGO_ENABLED=0 go test -timeout 30s .
@@ -37,10 +29,10 @@ EXPOSE 9090
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=builder /src/github.com/RichardoC/kube-rest-audit/src/kube-rest-audit /src/github.com/RichardoC/kube-rest-audit/src/kube-rest-audit
+COPY --from=builder /src/github.com/RichardoC/kube-rest-audit/kube-rest-audit /src/github.com/RichardoC/kube-rest-audit/kube-rest-audit
 
 USER 255999
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
-CMD ["/src/github.com/RichardoC/kube-rest-audit/src/kube-rest-audit"]
+CMD ["/src/github.com/RichardoC/kube-rest-audit/kube-rest-audit"]

@@ -56,6 +56,10 @@ Due to the failure:ignore there may be missing requests that were not logged in 
 
 WARNING: This will log all details of the request! This namespace should be very locked down to prevent priviledge escalation!
 
+### Certificate expires/invalid
+The application logs will be full of the following error, and you will *not* get any more audit logs until this is fixed.
+```2022/11/27 15:36:42 http: TLS handshake error from 10.42.0.1:46380: EOF```
+
 
 
 ## Next steps
@@ -70,3 +74,4 @@ WARNING: This will log all details of the request! This namespace should be very
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
+* rename to kube-audit-rest or kube-audit
