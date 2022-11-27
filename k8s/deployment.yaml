@@ -23,7 +23,7 @@ spec:
         app: kube-audit-rest
     spec:
       containers:
-      - image: docker.io/richardoc/kube-audit-rest:$COMMIT
+      - image: "docker.io/richardoc/kube-audit-rest:${COMMIT}"
         imagePullPolicy: IfNotPresent
         name: kube-audit-rest
         ports:

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 export COMMIT="$(git rev-parse HEAD)"
 
 # For storing temporary files that version control will ignore, such as certs
