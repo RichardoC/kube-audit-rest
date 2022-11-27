@@ -75,6 +75,7 @@ The application logs will be full of the following error, and you will *not* get
 * rename to kube-audit-rest 
 * make it clear log file only exists if requests are sent
 * clarify log file format is the raw response with no newlines, with one response per line.
+* clarify that kubernetes may not loadbalance between replicas as expcted.
 
 ## Completed next steps
 * Use flags for certs locations
