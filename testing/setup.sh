@@ -17,6 +17,9 @@ kubectl -n kube-audit-rest apply -f k8s/namespace.yaml
 # Upload the TLS cert and replace if exists
 kubectl -n kube-audit-rest create secret tls kube-audit-rest --cert=tmp/server.crt --key=tmp/server.key --dry-run=client -oyaml | kubectl -n kube-audit-rest apply -f -
 
+#Add Filebeat config
+kubectl -n kube-audit-rest apply -f k8s/configmap_console.yaml
+
 # Substitute in the correct image tag
 cat k8s/deployment.yaml | envsubst | kubectl -n kube-audit-rest apply -f -
 
