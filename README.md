@@ -88,6 +88,7 @@ The application logs will be full of the following error, and you will *not* get
 * clarify log file format is the raw response with no newlines in the json, with one response per line.
 * clarify that kubernetes may not loadbalance between replicas as expected.
 * test properly rather than use sleeps to manage async things...
+* have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
 
 ## Completed next steps
 * Use flags for certs locations
