@@ -83,7 +83,6 @@ The application logs will be full of the following error, and you will *not* get
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
-* despite the above, make it possible to log to stdout, as useful for capturing less sensitive info directly without infra
 * make it clear log file only exists if requests are sent
 * clarify log file format is the raw response with no newlines in the json, with one response per line.
 * clarify that kubernetes may not loadbalance between replicas as expected.
@@ -97,3 +96,5 @@ The application logs will be full of the following error, and you will *not* get
 * rename to kube-audit-rest from kube-rest-audit
 * Add examples folder
 * Add local testing
+* use zap for logging rather than logrus
+* despite the issues, make it possible to log to stdout/stderr, as useful for capturing less sensitive info directly without infra

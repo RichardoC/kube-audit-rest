@@ -24,12 +24,9 @@ go run testing/locally/main.go
 
 export TEST_EXIT="$?"
 
-sleep 5 # Scientific way of waiting for the file to be written as async...
-
-
-
-diff testing/locally/data/kube-audit-rest.log tmp/kube-audit-rest.log && [ "$TEST_EXIT" -eq "0" ]&& echo "Test passed" || echo "output not as expected"
+sleep 2 # Scientific way of waiting for the file to be written as async...
 
 # Removing backgrounded process
-kill -- -$$
 pkill kube-audit-rest
+
+diff testing/locally/data/kube-audit-rest.log tmp/kube-audit-rest.log && [ "$TEST_EXIT" -eq "0" ]&& echo "Test passed" || echo "output not as expected"

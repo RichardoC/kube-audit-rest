@@ -15,6 +15,7 @@ import (
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapio"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -22,19 +23,6 @@ import (
 var healthy int32
 var lg *zap.Logger
 var logger *zap.SugaredLogger
-
-// func init() {
-
-// 	// Log as JSON instead of the default ASCII formatter.
-// 	// Makes it easier to be parsed by elastic search etc
-// 	logger.SetFormatter(&logrus.JSONFormatter{})
-// 	logger.SetOutput(os.Stderr)
-
-// 	// Use logrus for standard log output
-// 	// Note that `log` here references stdlib's log
-// 	// Not logrus imported under the name `log`.
-// 	log.SetOutput(logger.Writer())
-// }
 
 // minimum viable response
 // https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#response
@@ -47,15 +35,15 @@ const responseTemplate = `{
 	}
 }`
 
-func logRequest(requestBody []byte, auditLogger *lumberjack.Logger) {
+func logRequest(requestBody []byte, auditLogger io.Writer) {
 	_, err := fmt.Fprintln(auditLogger, string(requestBody))
 	if err != nil {
 		logger.Error(err)
 	}
 }
 
-func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumberjack.Logger) {
-	logger.Debugf("%+v", r)
+func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Writer) {
+	logger.Debugw("Got request", "request", r)
 	var body []byte
 	// Don't bother with any logic if there is no request
 	if r.Body != nil {
@@ -92,7 +80,7 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumb
 	}
 	requestUid := gjson.GetBytes(body, "request.uid").Str
 	if requestUid == "" {
-		logger.Debugw("failed to find request uid")
+		logger.Debugln("failed to find request uid")
 		w.Header().Set("error", "uid not provided")
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -108,6 +96,7 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumb
 
 type Options struct {
 	LoggerFilename   string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-audit-rest.log"`
+	AuditToStdErr    bool   `long:"audit-to-std-log" description:"Not recommended - log to stderr/stdout rather than a file"`
 	LoggerMaxSize    int    `long:"logger-max-size" description:"Maximum size for each log file in megabytes" default:"500"`
 	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store" default:"3"`
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
@@ -137,7 +126,7 @@ func main() {
 
 	}
 	defer lg.Sync()
-	logger := lg.Sugar()
+	logger = lg.Sugar()
 
 	logger.Infow("Got config",
 		"config", opts,
@@ -147,10 +136,19 @@ func main() {
 	undo := zap.RedirectStdLog(lg)
 	defer undo()
 
-	auditLogger := &lumberjack.Logger{
-		Filename:   opts.LoggerFilename,
-		MaxSize:    opts.LoggerMaxSize,
-		MaxBackups: opts.LoggerMaxBackups,
+	var auditLogger io.Writer
+
+	if opts.AuditToStdErr {
+		writer := &zapio.Writer{Log: lg, Level: zap.InfoLevel}
+		defer writer.Close()
+		auditLogger = writer
+
+	} else {
+		auditLogger = &lumberjack.Logger{
+			Filename:   opts.LoggerFilename,
+			MaxSize:    opts.LoggerMaxSize,
+			MaxBackups: opts.LoggerMaxBackups,
+		}
 	}
 
 	addr := fmt.Sprintf(":%d", opts.ServerPort)
