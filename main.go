@@ -12,27 +12,29 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
+	"go.uber.org/zap"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var logger = logrus.New()
+// var logger = logrus.New()
 var healthy int32
+var lg *zap.Logger
+var logger *zap.SugaredLogger
 
-func init() {
+// func init() {
 
-	// Log as JSON instead of the default ASCII formatter.
-	// Makes it easier to be parsed by elastic search etc
-	logger.SetFormatter(&logrus.JSONFormatter{})
-	logger.SetOutput(os.Stderr)
+// 	// Log as JSON instead of the default ASCII formatter.
+// 	// Makes it easier to be parsed by elastic search etc
+// 	logger.SetFormatter(&logrus.JSONFormatter{})
+// 	logger.SetOutput(os.Stderr)
 
-	// Use logrus for standard log output
-	// Note that `log` here references stdlib's log
-	// Not logrus imported under the name `log`.
-	log.SetOutput(logger.Writer())
-}
+// 	// Use logrus for standard log output
+// 	// Note that `log` here references stdlib's log
+// 	// Not logrus imported under the name `log`.
+// 	log.SetOutput(logger.Writer())
+// }
 
 // minimum viable response
 // https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#response
@@ -58,15 +60,16 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumb
 	// Don't bother with any logic if there is no request
 	if r.Body != nil {
 		if data, err := io.ReadAll(r.Body); err == nil {
-			logger.WithField("body", data).Debug("Got this body")
+			logger.Debugw("Got this body", "body", data)
 			body = data
 		} else {
-			logger.WithField("body", r.Body).Debug(err)
+			logger.Debugw(err.Error(), "body", r.Body)
 			w.Header().Set("error", "Failed to read body")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 	} else {
+		logger.Debugw("No body provided")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("error", "No body provided")
 		return
@@ -75,21 +78,21 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumb
 	// verify the content type is accurate
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "application/json" {
-		logger.WithField("contentType", contentType).Debugf("expect application/json")
+		logger.Debugw("expect application/json", "contentType", contentType)
 		w.Header().Set("error", "expect contentType application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !gjson.ValidBytes(body) {
-		logger.WithField("body", body).Debug("invalid json")
+		logger.Debugw("invalid json", "body", body)
 		w.Header().Set("error", "invalid json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	requestUid := gjson.GetBytes(body, "request.uid").Str
 	if requestUid == "" {
-		logger.Debug("failed to find request uid")
+		logger.Debugw("failed to find request uid")
 		w.Header().Set("error", "uid not provided")
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -110,7 +113,7 @@ type Options struct {
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
-	LoggingLevel     int    `long:"verbosity" short:"v" description:"Logging verbosity, 4=info, debug=5" default:"4"`
+	Verbose          bool   `long:"verbosity" short:"v" description:"Verbose mode"`
 }
 
 func main() {
@@ -118,11 +121,31 @@ func main() {
 	parser := flags.NewParser(&opts, flags.Default)
 	_, err := parser.Parse()
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatalf("can't parse flags: %x", err)
 	}
-	logger.WithField("config", opts).Info("Got config")
 
-	logger.SetLevel(logrus.Level(opts.LoggingLevel))
+	if opts.Verbose {
+		lg, err = zap.NewDevelopment()
+		if err != nil {
+			log.Fatalf("can't initialize zap logger: %v", err)
+		}
+	} else {
+		lg, err = zap.NewProduction()
+		if err != nil {
+			log.Fatalf("can't initialize zap logger: %v", err)
+		}
+
+	}
+	defer lg.Sync()
+	logger := lg.Sugar()
+
+	logger.Infow("Got config",
+		"config", opts,
+	)
+
+	// Send standard logging to zap
+	undo := zap.RedirectStdLog(lg)
+	defer undo()
 
 	auditLogger := &lumberjack.Logger{
 		Filename:   opts.LoggerFilename,
@@ -130,19 +153,16 @@ func main() {
 		MaxBackups: opts.LoggerMaxBackups,
 	}
 
-	// Required so http errors structured
-	w := logger.Writer()
-	defer w.Close()
-
 	addr := fmt.Sprintf(":%d", opts.ServerPort)
-	logger.WithField("addr", addr).Info("Starting server")
+	logger.Infow("Starting server",
+		"addr", addr)
 
 	router := http.NewServeMux()
 	router.HandleFunc("/log-request", func(w http.ResponseWriter, r *http.Request) { logRequestHandler(w, r, auditLogger) })
 	server := &http.Server{
-		Addr:         addr,
-		Handler:      router,
-		ErrorLog:     log.New(w, "", 0),
+		Addr:    addr,
+		Handler: router,
+		// ErrorLog:     log.New(w, "", 0),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
@@ -155,7 +175,7 @@ func main() {
 
 	go func() {
 		<-quit
-		logger.Println("Server is shutting down...")
+		logger.Warnln("Server is shutting down...")
 		atomic.StoreInt32(&healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -168,16 +188,13 @@ func main() {
 		close(done)
 	}()
 
-	logger.Println("Server is ready to handle requests at", addr)
+	logger.Infow("Server is ready to handle requests", "addr", addr)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServeTLS(opts.CertFilename, opts.CertKeyFilename); err != nil && err != http.ErrServerClosed {
-		logger.WithField("addr", addr).Fatal(err)
+		logger.Fatal(err, "addr", addr)
 	}
 
 	<-done
-	logger.Println("Server stopped")
-
-	// err = http.ListenAndServeTLS(addr, opts.CertFilename, opts.CertKeyFilename, nil)
-	// logger.Fatal(err)
+	logger.Infow("Server stopped")
 
 }

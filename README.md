@@ -97,4 +97,3 @@ The application logs will be full of the following error, and you will *not* get
 * rename to kube-audit-rest from kube-rest-audit
 * Add examples folder
 * Add local testing
-
