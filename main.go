@@ -27,7 +27,6 @@ func init() {
 	// Makes it easier to be parsed by elastic search etc
 	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(os.Stderr)
-	logger.SetLevel(logrus.InfoLevel)
 
 	// Use logrus for standard log output
 	// Note that `log` here references stdlib's log
@@ -35,6 +34,8 @@ func init() {
 	log.SetOutput(logger.Writer())
 }
 
+// minimum viable response
+// https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#response
 const responseTemplate = `{
 	"apiVersion": "admission.k8s.io/v1",
 	"kind": "AdmissionReview",
@@ -45,25 +46,29 @@ const responseTemplate = `{
 }`
 
 func logRequest(requestBody []byte, auditLogger *lumberjack.Logger) {
-	_, err := fmt.Fprintf(auditLogger, "%s", requestBody)
+	_, err := fmt.Fprintln(auditLogger, string(requestBody))
 	if err != nil {
 		logger.Error(err)
 	}
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumberjack.Logger) {
+	logger.Debugf("%+v", r)
 	var body []byte
 	// Don't bother with any logic if there is no request
 	if r.Body != nil {
 		if data, err := io.ReadAll(r.Body); err == nil {
+			logger.WithField("body", data).Debug("Got this body")
 			body = data
 		} else {
 			logger.WithField("body", r.Body).Debug(err)
+			w.Header().Set("error", "Failed to read body")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("error", "No body provided")
 		return
 	}
 
@@ -71,18 +76,21 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger *lumb
 	contentType := r.Header.Get("Content-Type")
 	if contentType != "application/json" {
 		logger.WithField("contentType", contentType).Debugf("expect application/json")
+		w.Header().Set("error", "expect contentType application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !gjson.ValidBytes(body) {
 		logger.WithField("body", body).Debug("invalid json")
+		w.Header().Set("error", "invalid json")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	requestUid := gjson.GetBytes(body, "request.uid").Str
 	if requestUid == "" {
 		logger.Debug("failed to find request uid")
+		w.Header().Set("error", "uid not provided")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -102,6 +110,7 @@ type Options struct {
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
+	LoggingLevel     int    `long:"verbosity" short:"v" description:"Logging verbosity, 4=info, debug=5" default:"4"`
 }
 
 func main() {
@@ -112,6 +121,8 @@ func main() {
 		logger.Fatal(err)
 	}
 	logger.WithField("config", opts).Info("Got config")
+
+	logger.SetLevel(logrus.Level(opts.LoggingLevel))
 
 	auditLogger := &lumberjack.Logger{
 		Filename:   opts.LoggerFilename,

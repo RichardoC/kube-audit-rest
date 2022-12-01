@@ -43,6 +43,19 @@ E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-au
 
 ```
 
+### Local testing
+
+```bash
+testing/locally/local-testing.sh
+...
+Test passed
+{"level":"info","msg":"Server is shutting down...","time":"2022-12-01T19:43:01Z"}
+{"level":"info","msg":"Server stopped","time":"2022-12-01T19:43:01Z"}
+Terminated
+```
+
+If this failed, you will see `output not as expected`
+
 ## Known limitations
 From the k8s documentation
 
@@ -73,11 +86,13 @@ The application logs will be full of the following error, and you will *not* get
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
 * make it clear log file only exists if requests are sent
 * clarify log file format is the raw response with no newlines, with one response per line.
-* clarify that kubernetes may not loadbalance between replicas as expcted.
+* clarify that kubernetes may not loadbalance between replicas as expected.
+* test properly rather than use sleeps to manage async things...
 
 ## Completed next steps
 * Use flags for certs locations
 * write to a file rather than STDOUT with rotation and/or a max size
 * Use structured logging
 * rename to kube-audit-rest from kube-rest-audit
+* Add examples folder
 

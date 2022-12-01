@@ -2,6 +2,10 @@
 
 set -x
 
+ROOT=$(git rev-parse --show-toplevel)
+
+cd $ROOT
+
 export COMMIT="$(git rev-parse HEAD)"
 
 # For storing temporary files that version control will ignore, such as certs
