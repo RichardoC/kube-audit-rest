@@ -1,0 +1,25 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+x509_extensions = v3_req
+
+CA_default = [ca]
+
+[dn]
+C=GB
+OU=Engineering
+emailAddress=admin@localhost
+CN = ca.local
+
+[ca]
+copy_extensions = copy 
+
+
+[ v3_req ]
+# Extensions for a typical CA (`man x509v3_config`).
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer 
+basicConstraints = critical, CA:true
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign

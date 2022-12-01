@@ -1,0 +1,16 @@
+# Ignore files not built in docker image
+kube-audit-rest
+
+# Ignore git directories
+.git
+.gitignore
+
+# Ignore tmp so certs/etc not leaked
+tmp/
+testing/
+
+# Ignore circleci
+.circleci
+
+# Docker
+Dockerfile
