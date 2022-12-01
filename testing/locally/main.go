@@ -56,6 +56,7 @@ func main() {
 			log.Println(err)
 			break
 		}
+		line = append(line, '\n')
 		resp, err := client.Post("https://kube-audit-rest:9090/log-request", "application/json", bytes.NewBuffer(line))
 		if err != nil {
 			testFailureCount += 1
@@ -78,7 +79,8 @@ func main() {
 	}
 
 	// Send an almost valid request, but missing the uid
-	resp, err = client.Post("https://kube-audit-rest:9090/log-request", "application/json", bytes.NewBuffer([]byte(`{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"kind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"resource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"requestKind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"requestResource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"operation":"CREATE","userInfo":{"username":"system:admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","metadata":{"creationTimestamp":null,"managedFields":[{"manager":"steveTEST","operation":"Update","apiVersion":"authorization.k8s.io/v1","time":"2022-11-30T17:46:51Z","fieldsType":"FieldsV1","fieldsV1":{"f:spec":{"f:resourceAttributes":{".":{},"f:group":{},"f:resource":{},"f:verb":{},"f:version":{}}}}}]},"spec":{"resourceAttributes":{"verb":"list","group":"batch","version":"v1","resource":"cronjobs"}},"status":{"allowed":false}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1"}}}`)))
+	resp, err = client.Post("https://kube-audit-rest:9090/log-request", "application/json", bytes.NewBuffer([]byte(`{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"kind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"resource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"requestKind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"requestResource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"operation":"CREATE","userInfo":{"username":"system:admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","metadata":{"creationTimestamp":null,"managedFields":[{"manager":"steveTEST","operation":"Update","apiVersion":"authorization.k8s.io/v1","time":"2022-11-30T17:46:51Z","fieldsType":"FieldsV1","fieldsV1":{"f:spec":{"f:resourceAttributes":{".":{},"f:group":{},"f:resource":{},"f:verb":{},"f:version":{}}}}}]},"spec":{"resourceAttributes":{"verb":"list","group":"batch","version":"v1","resource":"cronjobs"}},"status":{"allowed":false}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1"}}}
+	`)))
 	if err != nil || resp.StatusCode != http.StatusBadRequest {
 		testFailureCount += 1
 		log.Println(err)

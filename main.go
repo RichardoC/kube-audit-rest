@@ -36,10 +36,12 @@ const responseTemplate = `{
 }`
 
 func logRequest(requestBody []byte, auditLogger io.Writer) {
-	_, err := fmt.Fprintln(auditLogger, string(requestBody))
+	_, err := fmt.Fprint(auditLogger, string(requestBody))
 	if err != nil {
 		logger.Error(err)
 	}
+	// Ensures logs are ordered ~ by insertion time
+	lg.Sync()
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Writer) {
