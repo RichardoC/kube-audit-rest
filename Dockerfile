@@ -2,7 +2,7 @@
 FROM golang@sha256:d171aa333fb386089206252503bc6ab545072670e0286e3d1bbc644362825c6e as builder
 
 # Can be removed once testing done from go rather than bash
-RUN apk add --no-cache bash diffutils git openssl
+RUN apk add --no-cache bash diffutils git jq openssl
 
 WORKDIR /src/github.com/RichardoC/kube-audit-rest
 

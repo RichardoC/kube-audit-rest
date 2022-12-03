@@ -79,6 +79,7 @@ The application logs will be full of the following error, and you will *not* get
 * upload images on git commit
 * make a distroless version
 * explain zero stability guarantees until above completed
+* clarify logs are not guaranteed to be ordered because there aren't guarantees from k8s that the requests would arrive in order.
 * explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
@@ -88,6 +89,7 @@ The application logs will be full of the following error, and you will *not* get
 * clarify that kubernetes may not loadbalance between replicas as expected.
 * test properly rather than use sleeps to manage async things...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
+* have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 
 ## Completed next steps
 * Use flags for certs locations
