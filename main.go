@@ -46,8 +46,6 @@ func logRequest(requestBody []byte, auditLogger io.Writer) {
 	if err != nil {
 		logger.Error(err)
 	}
-	// Ensures logs are ordered ~ by insertion time
-	lg.Sync()
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Writer) {
@@ -182,6 +180,10 @@ func main() {
 	go func() {
 		<-quit
 		logger.Warnln("Server is shutting down...")
+		// Sync loggers to make them persist
+		logger.Sync()
+		lg.Sync()
+
 		atomic.StoreInt32(&healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
