@@ -48,8 +48,8 @@ jobs:
           context: .
           push: true # push the image to ghcr
           tags: |
-            RichardoC/kube-audit-rest:${{steps.meta.outputs.sha}}
-            RichardoC/kube-audit-rest:latest
+            ghcr.io/RichardoC/kube-audit-rest:${{steps.meta.outputs.sha}}
+            ghcr.io/RichardoC/kube-audit-rest:latest
 
           labels: ${{ steps.meta.outputs.labels }}
           
