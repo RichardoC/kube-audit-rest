@@ -1,7 +1,8 @@
 # golang:1.19.3-alpine3.16
 FROM golang@sha256:d171aa333fb386089206252503bc6ab545072670e0286e3d1bbc644362825c6e as builder
 
-RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
+# Can be removed once testing done from go rather than bash
+RUN apk add --no-cache bash diffutils git openssl
 
 WORKDIR /src/github.com/RichardoC/kube-audit-rest
 
@@ -11,14 +12,12 @@ RUN go mod download
 
 COPY . .
 
-# TODO add tests and uncomment
-# RUN CGO_ENABLED=0 go test -timeout 30s .
-
 RUN go build .
 
-# RUN CGO_ENABLED=0 GOOS=linux go build  -ldflags "-s" -a  -installsuffix 'static' .
 RUN CGO_ENABLED=0 GOOS=linux go build .
 
+# Do simple local testing
+RUN ./testing/locally/local-testing.sh
 
 # TODO offer scratch as an option
 
