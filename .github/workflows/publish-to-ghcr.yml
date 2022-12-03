@@ -1,9 +1,9 @@
 name: Publish Docker 🐳 images 📦 to GitHub Container Registry
 
 on:
-  release:
-    types: [created]
-  workflow_dispatch: {}
+  push:
+    branches:
+      - 'main'
 
 jobs:
 
@@ -47,6 +47,9 @@ jobs:
           file: Dockerfile
           context: .
           push: true # push the image to ghcr
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            RichardoC/kube-audit-rest:${{steps.meta.outputs.sha}}
+            RichardoC/kube-audit-rest:latest
+
           labels: ${{ steps.meta.outputs.labels }}
           
