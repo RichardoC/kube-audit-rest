@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -36,7 +38,11 @@ const responseTemplate = `{
 }`
 
 func logRequest(requestBody []byte, auditLogger io.Writer) {
-	_, err := fmt.Fprint(auditLogger, string(requestBody))
+	// Compact the json for single line use regardless of request prettiness
+	dst := &bytes.Buffer{}
+	json.Compact(dst, requestBody)
+
+	_, err := fmt.Fprintln(auditLogger, dst)
 	if err != nil {
 		logger.Error(err)
 	}
