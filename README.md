@@ -79,6 +79,7 @@ The application logs will be full of the following error, and you will *not* get
 * upload images on git commit
 * make a distroless version
 * explain zero stability guarantees until above completed
+* clarify logs are not guaranteed to be ordered because there aren't guarantees from k8s that the requests would arrive in order.
 * explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
