@@ -6,7 +6,6 @@ on:
       - 'main'
 
 jobs:
-
   build-and-publish-to-ghcr:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
@@ -44,7 +43,7 @@ jobs:
       - name: Build and push alpine based image
         uses: docker/build-push-action@v3
         with:
-          file: Dockerfile
+          file: Dockerfile-alpine
           context: .
           push: true # push the image to ghcr
           tags: |
