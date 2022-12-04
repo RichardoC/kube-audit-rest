@@ -108,7 +108,7 @@ type Options struct {
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
-	Verbose          bool   `long:"verbosity" short:"v" description:"Verbose mode"`
+	Verbose          bool   `long:"verbosity" short:"v" description:"Uses zap Development default verbose mode rather than production"`
 }
 
 func main() {
@@ -116,7 +116,7 @@ func main() {
 	parser := flags.NewParser(&opts, flags.Default)
 	_, err := parser.Parse()
 	if err != nil {
-		log.Fatalf("can't parse flags: %x", err)
+		log.Fatalf("can't parse flags: %v", err)
 	}
 
 	if opts.Verbose {
@@ -133,6 +133,7 @@ func main() {
 	}
 	defer lg.Sync()
 	logger = lg.Sugar()
+	defer logger.Sync()
 
 	logger.Infow("Got config",
 		"config", opts,
@@ -150,11 +151,13 @@ func main() {
 		auditLogger = writer
 
 	} else {
-		auditLogger = &lumberjack.Logger{
+		lumberjackLogger := &lumberjack.Logger{
 			Filename:   opts.LoggerFilename,
 			MaxSize:    opts.LoggerMaxSize,
 			MaxBackups: opts.LoggerMaxBackups,
 		}
+		auditLogger = lumberjackLogger
+		defer lumberjackLogger.Close()
 	}
 
 	addr := fmt.Sprintf(":%d", opts.ServerPort)
@@ -199,7 +202,7 @@ func main() {
 	logger.Infow("Server is ready to handle requests", "addr", addr)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServeTLS(opts.CertFilename, opts.CertKeyFilename); err != nil && err != http.ErrServerClosed {
-		logger.Fatal(err, "addr", addr)
+		logger.Fatalw("Failed to start server", "error", err, "addr", addr)
 	}
 
 	<-done
