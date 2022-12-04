@@ -1,16 +1,67 @@
 # kube-audit-rest
+
 Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with EKS?
-Use kube-audit-rest
+Use kube-audit-rest to capture all API calls to disk, before exporting those to your logging infrastructure.
+This should be much cheaper than cloudtrail which charges ~ per API call and doesn't support ingestion filtering.  
 
 ## What this is
+
 A simple logger of requests to the k8s api.
 
 ## What this isn't
+
 A filtering/redaction/forwarder system. That's for the user to do.
 
-## Deploying
+## Kubernetes distribution compatibility
+
+Unknown but likely to work with all distributions due to how fundamental the 
+ValidatingWebhook API is to Kubernetes operators.
+
+
+## Usage
+
+An example of how to deploy this service can be found within `./k8s` and steps to actually deploy it in `testing/setup.sh`
+You could either run this centrally (though it would be difficult to tell which API calls are from which clusters) or running in each cluster.
+At minimum you require
+* Ability to create ValidatingWebhookConfiguration on the target k8s cluster.
+* A CA, and a TLS certificate signed for the address the kubernetes control plane is connecting to for connections to kube-audit-rest
+* kube-audit-rest running somewhere connectable by the kubernetes control plane.
+* some disk space for kube-audit-rest to write to.
+
+If you are running kube-audit-rest within the kubernetes cluster it is auditing you also require
+* a deployment of kube-audit-rest running
+* a service targeting the kube-audit-rest pods
+
+
+### Binary options
+
+```bash
+$ kube-audit-rest --help
+Usage:
+  kube-audit-rest [OPTIONS]
+
+Application Options:
+      --logger-filename=    Location to log audit log to (default: /tmp/kube-audit-rest.log)
+      --audit-to-std-log    Not recommended - log to stderr/stdout rather than a file
+      --logger-max-size=    Maximum size for each log file in megabytes (default: 500)
+      --logger-max-backups= Maximum number of rolled log files to store (default: 3)
+      --cert-filename=      Location of certificate for TLS (default: /etc/tls/tls.crt)
+      --cert-key-filename=  Location of certificate key for TLS (default: /etc/tls/tls.key)
+      --server-port=        Port to run https server on (default: 9090)
+  -v, --verbosity           Uses zap Development default verbose mode rather than production
+
+Help Options:
+  -h, --help                Show this help message
+```
+## API spec for kube-audit-rest output
+
+This is the raw [AdmissionRequest](https://github.com/kubernetes/api/blob/master/admission/v1/types.go#L39) request and can be parsed using that [schema](https://github.com/kubernetes/kubernetes/blob/master/api/openapi-spec/swagger.json)
+
+An easier version of this to interact with can be found [here](https://github.com/yannh/kubernetes-json-schema/)
+
 
 ## Building
+
 Requires nerdctl and rancher desktop as a way of building/testing locally with k8s.
 
 ```bash
@@ -21,6 +72,7 @@ Requires nerdctl and rancher desktop as a way of building/testing locally with k
 ```
 
 ### Testing
+
 Run via the Building commands, then the following should contain various admission requests
 
 ```bash
@@ -57,6 +109,7 @@ Terminated
 If this failed, you will see `output not as expected`
 
 ## Known limitations
+
 From the k8s documentation
 
 ```text
@@ -70,14 +123,14 @@ Due to the failure:ignore there may be missing requests that were not logged in 
 WARNING: This will log all details of the request! This namespace should be very locked down to prevent priviledge escalation!
 
 ### Certificate expires/invalid
+
 The application logs will be full of the following error, and you will *not* get any more audit logs until this is fixed.
 ```2022/11/27 15:36:42 http: TLS handshake error from 10.42.0.1:46380: EOF```
 
 
 
 ## Next steps
-* upload images on git commit
-* make a distroless version
+
 * explain zero stability guarantees until above completed
 * clarify logs are not guaranteed to be ordered because there aren't guarantees from k8s that the requests would arrive in order.
 * explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
@@ -91,14 +144,17 @@ The application logs will be full of the following error, and you will *not* get
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
 * have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 * document that image defaults to distroless
-* document this writes to default ephemeral 
+* document this writes to default ephemeral storage
 
 ## Completed next steps
+
 * Use flags for certs locations
 * write to a file rather than STDOUT with rotation and/or a max size
 * Use structured logging
 * rename to kube-audit-rest from kube-rest-audit
 * Add examples folder
 * Add local testing
-* use zap for logging rather than logrus
+* use zap for logging rather than logrus for prettier http error logs
 * despite the issues, make it possible to log to stdout/stderr, as useful for capturing less sensitive info directly without infra
+* upload images on git commit
+* make a distroless version

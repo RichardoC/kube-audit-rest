@@ -169,7 +169,6 @@ func main() {
 	server := &http.Server{
 		Addr:    addr,
 		Handler: router,
-		// ErrorLog:     log.New(w, "", 0),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
