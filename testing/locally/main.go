@@ -12,6 +12,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -104,6 +105,21 @@ func main() {
 		log.Println(err)
 	} else {
 		log.Println(resp)
+	}
+
+	// Ensure metrics server running
+	resp, err = client.Get("http://localhost:55555/metrics")
+	if err != nil {
+		testFailureCount += 1
+	} else {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			testFailureCount += 1
+			log.Println(err)
+		} else if !strings.Contains(string(bodyBytes), "kube-audit-rest") {
+			testFailureCount += 1
+			log.Println("Failed to find any metrics")
+		}
 	}
 
 	if testFailureCount > 0 {

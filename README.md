@@ -14,8 +14,7 @@ A filtering/redaction/forwarder system. That's for the user to do.
 
 ## Kubernetes distribution compatibility
 
-Unknown but likely to work with all distributions due to how fundamental the 
-ValidatingWebhook API is to Kubernetes operators. At worst the MutatingAdmissionWebhook API can be used instead, though that does mean that subverting this binary could lead to a cluster takeover and that it may not log the final version of the object.
+Unknown but likely to work with all distributions due to how fundamental the ValidatingWebhook API is to Kubernetes operators. At worst the MutatingAdmissionWebhook API can be used instead, though that does mean that subverting this binary could lead to a cluster takeover and that it may not log the final version of the object.
 
 
 ## Usage
@@ -26,7 +25,8 @@ At minimum you require
 * Ability to create ValidatingWebhookConfiguration on the target k8s cluster.
 * A CA, and a TLS certificate signed for the address the kubernetes control plane is connecting to for connections to kube-audit-rest
 * kube-audit-rest running somewhere connectable by the kubernetes control plane.
-* some disk space for kube-audit-rest to write to.
+* some disk space for kube-audit-rest to write to. Defaults to `/tmp` which is a ramfs on most linux distributions, though not on Kubernetes.
+* Either to build a copy of the binary yourself, or download a copy of the docker image via the steps on the [packages page](https://github.com/RichardoC/kube-audit-rest/pkgs/container/kube-audit-rest) which is available as a distroless image (default, and `latest`) with suffix -distroless and a -alpine image based on the alpine docker image.
 
 If you are running kube-audit-rest within the kubernetes cluster it is auditing you also require
 * a deployment of kube-audit-rest running
@@ -56,7 +56,7 @@ Help Options:
 
 ### Resource requirements
 
-Unknown, if anyone performs benchmarks please open a pull request with your findings.
+Unknown, if anyone performs benchmarks please open a pull request with your findings. These can be set by following the instructions [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
 
 ### Limiting which requests are logged
 
@@ -68,6 +68,19 @@ This is the raw [AdmissionRequest](https://github.com/kubernetes/api/blob/master
 
 An easier version of this to interact with can be found [here](https://github.com/yannh/kubernetes-json-schema/)
 
+kube-audit-rest should log one request per line, in compacted json.
+
+## Metrics
+kube-audit-rest provide some metrics describing its own operations, both as an application specifically and as a go binary. .
+
+All the specific application metrics are prefixed with `kube_audit_rest_`.
+
+| Metric name | Metric type | Labels | Description |
+| ----------- | ----------- | ------ | ----------- |
+| kube_audit_rest_valid_requests_processed_total | Counter | | Total number of valid requests processed |
+| kube_audit_rest_http_requests_total | Counter | | Total number of requests to kube-audit-rest |
+
+kube-audit-rest also exposes all default go metrics from the (Prometheus Go collector)[https://github.com/prometheus/client_golang/blob/main/prometheus/go_collector.go]
 
 ## Building
 
@@ -119,44 +132,41 @@ If this failed, you will see `output not as expected`
 
 ## Known limitations and warnings
 
-From the k8s documentation
+From the k8s documentation [see rules](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#validatingwebhook-v1-admissionregistration-k8s-io)
 
 ```text
 Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
 ```
 
-This webhook also cannot know that all other validating webhooks passed so may log requests that were failed by other validating webhooks afterwarss.
+This webhook also cannot know that all other validating webhooks passed so may log requests that were failed by other validating webhooks afterwards.
 
-Due to the failure:ignore there may be missing requests that were not logged in the interests of availability.
+Due to the `failure: ignore` in the example webhook configurations there may be missing requests that were not logged in the interests of availability of the kubernetes API..
 
-WARNING: This will log all details of the request! This namespace should be very locked down to prevent priviledge escalation!
+WARNING: This will log all details of the request! This namespace should be very locked down to prevent privilege escalation!
 
 This webhook will also record dry-run requests.
 
-API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy).
+The audit log files will only exist if valid API calls are sent to the webhook binary.
+
+API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy) and thus may not be in chronological order.
 
 ### Certificate expires/invalid
 
 The application logs will be full of the following error, and you will *not* get any more audit logs until this is fixed.
 ```2022/11/27 15:36:42 http: TLS handshake error from 10.42.0.1:46380: EOF```
 
+Kubernetes may not load balance between replicas of kube-audit-rest in the way you expect as this behaviour appears to be undocumented.
 
 
 ## Next steps
 
 * explain zero stability guarantees until above completed
-* clarify logs are not guaranteed to be ordered because there aren't guarantees from k8s that the requests would arrive in order.
-* explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for mem/cpu/total requests dealt with/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
-* make it clear log file only exists if requests are sent
-* clarify log file format is the raw response with no newlines in the json, with one response per line.
-* clarify that kubernetes may not loadbalance between replicas as expected.
 * test properly rather than use sleeps to manage async things...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
 * have workflow to test that docker image can be created once a maintainer adds a label to the PR.
-* document that image defaults to distroless
 * document this writes to default ephemeral storage
 
 ## Completed next steps
@@ -171,3 +181,9 @@ The application logs will be full of the following error, and you will *not* get
 * despite the issues, make it possible to log to stdout/stderr, as useful for capturing less sensitive info directly without infra
 * upload images on git commit
 * make a distroless version
+* clarify logs are not guaranteed to be ordered because there aren't guarantees from k8s that the requests would arrive in order.
+* explain how to limit resources it's logging via the webhook resource (just a link to the k8s docs)
+* make it clear log file only exists if requests are sent
+* clarify log file format is the raw response with no newlines in the json, with one response per line.
+* clarify that kubernetes may not loadbalance between replicas as expected.
+* document that image defaults to distroless

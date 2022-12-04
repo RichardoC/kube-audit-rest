@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
 	"go.uber.org/zap"
@@ -21,7 +23,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// var logger = logrus.New()
 var healthy int32
 var lg *zap.Logger
 var logger *zap.SugaredLogger
@@ -49,6 +50,7 @@ func logRequest(requestBody []byte, auditLogger io.Writer) {
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Writer) {
+	totalRequests.Inc()
 	logger.Debugw("Got request", "request", r)
 	var body []byte
 	// Don't bother with any logic if there is no request
@@ -95,9 +97,37 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Wr
 	// Sychronous so that slower writes *do* slow our responses
 	logRequest(body, auditLogger)
 
+	// Record we processed a valid request
+	validRequestsProcessed.Inc()
+
 	// Template the uid into our default approval and finish up
 	fmt.Fprintf(w, responseTemplate, requestUid)
 
+}
+
+// For holding the metrics
+var (
+	validRequestsProcessed = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "kube_audit_rest_valid_requests_processed_total",
+		Help: "Total number of valid requests processed",
+	})
+	totalRequests = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "kube_audit_rest_http_requests_total",
+			Help: "Total number of requests to kube-audit-rest",
+		},
+	)
+)
+
+func runMetrics(port int) {
+	prometheus.MustRegister(validRequestsProcessed)
+	prometheus.MustRegister(totalRequests)
+	http.Handle("/metrics", promhttp.Handler())
+	addr := fmt.Sprintf(":%d", port)
+	logger.Infow("Starting metrics server",
+		"addr", addr)
+
+	http.ListenAndServe(addr, nil)
 }
 
 type Options struct {
@@ -108,6 +138,7 @@ type Options struct {
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
+	MetricsPort      int    `long:"metrics-port" description:"Port to run http metrics server on" default:"55555"`
 	Verbose          bool   `long:"verbosity" short:"v" description:"Uses zap Development default verbose mode rather than production"`
 }
 
@@ -160,6 +191,8 @@ func main() {
 		defer lumberjackLogger.Close()
 	}
 
+	go runMetrics(opts.MetricsPort)
+
 	addr := fmt.Sprintf(":%d", opts.ServerPort)
 	logger.Infow("Starting server",
 		"addr", addr)
@@ -167,8 +200,8 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/log-request", func(w http.ResponseWriter, r *http.Request) { logRequestHandler(w, r, auditLogger) })
 	server := &http.Server{
-		Addr:    addr,
-		Handler: router,
+		Addr:         addr,
+		Handler:      router,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
@@ -198,7 +231,6 @@ func main() {
 		close(done)
 	}()
 
-	logger.Infow("Server is ready to handle requests", "addr", addr)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServeTLS(opts.CertFilename, opts.CertKeyFilename); err != nil && err != http.ErrServerClosed {
 		logger.Fatalw("Failed to start server", "error", err, "addr", addr)

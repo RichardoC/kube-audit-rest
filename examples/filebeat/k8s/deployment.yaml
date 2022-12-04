@@ -23,13 +23,16 @@ spec:
         app: kube-audit-rest
     spec:
       containers:
-      - image: docker.io/richardoc/kube-audit-rest:$COMMIT
+      - image: "ghcr.io/richardoc/kube-audit-rest:${COMMIT}-distroless"
         imagePullPolicy: IfNotPresent
         name: kube-audit-rest
         ports:
         - containerPort: 9090
           protocol: TCP
           name: https
+        - containerPort: 55555
+          protocol: TCP
+          name: metrics
         volumeMounts:
         - name: certs
           mountPath: "/etc/tls"
