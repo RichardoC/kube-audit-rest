@@ -15,7 +15,7 @@ A filtering/redaction/forwarder system. That's for the user to do.
 ## Kubernetes distribution compatibility
 
 Unknown but likely to work with all distributions due to how fundamental the 
-ValidatingWebhook API is to Kubernetes operators.
+ValidatingWebhook API is to Kubernetes operators. At worst the MutatingAdmissionWebhook API can be used instead, though that does mean that subverting this binary could lead to a cluster takeover and that it may not log the final version of the object.
 
 
 ## Usage
@@ -53,6 +53,15 @@ Application Options:
 Help Options:
   -h, --help                Show this help message
 ```
+
+### Resource requirements
+
+Unknown, if anyone performs benchmarks please open a pull request with your findings.
+
+### Limiting which requests are logged
+
+In your `ValidatingWebhookConfiguration` use the limited amount of resources and verbs you wish to log, rather than the `*`s in `./k8s/webhook.yaml` using the [Kubernetes documentation](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-configuration)
+
 ## API spec for kube-audit-rest output
 
 This is the raw [AdmissionRequest](https://github.com/kubernetes/api/blob/master/admission/v1/types.go#L39) request and can be parsed using that [schema](https://github.com/kubernetes/kubernetes/blob/master/api/openapi-spec/swagger.json)
@@ -108,7 +117,7 @@ Terminated
 
 If this failed, you will see `output not as expected`
 
-## Known limitations
+## Known limitations and warnings
 
 From the k8s documentation
 
@@ -121,6 +130,10 @@ This webhook also cannot know that all other validating webhooks passed so may l
 Due to the failure:ignore there may be missing requests that were not logged in the interests of availability.
 
 WARNING: This will log all details of the request! This namespace should be very locked down to prevent priviledge escalation!
+
+This webhook will also record dry-run requests.
+
+API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy).
 
 ### Certificate expires/invalid
 
