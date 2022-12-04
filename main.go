@@ -116,7 +116,7 @@ func main() {
 	parser := flags.NewParser(&opts, flags.Default)
 	_, err := parser.Parse()
 	if err != nil {
-		log.Fatalf("can't parse flags: %x", err)
+		log.Fatalf("can't parse flags: %v", err)
 	}
 
 	if opts.Verbose {
