@@ -92,8 +92,8 @@ func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Wr
 		return
 	}
 
-	// So we don't hold up the request with any further processing
-	go logRequest(body, auditLogger)
+	// Sychronous so that slower writes *do* slow our responses
+	logRequest(body, auditLogger)
 
 	// Template the uid into our default approval and finish up
 	fmt.Fprintf(w, responseTemplate, requestUid)
