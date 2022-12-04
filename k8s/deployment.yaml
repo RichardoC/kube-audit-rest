@@ -6,6 +6,7 @@ metadata:
   name: kube-audit-rest
   namespace: kube-audit-rest
 spec:
+  automountServiceAccountToken: false
   progressDeadlineSeconds: 600
   replicas: 3
   revisionHistoryLimit: 10
@@ -34,9 +35,23 @@ spec:
         - name: certs
           mountPath: "/etc/tls"
           readOnly: true
+        - name: tmp
+          mountPath: "/tmp"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 255999 # Already true in the container, but does no harm to be explicit
+          runAsGroup: 255999
+          fsGroup: 255999
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: 
+            - ALL 
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
       - name: certs
         secret:
           secretName: kube-audit-rest
+      - name: tmp
+        emptyDir:
+          sizeLimit: 2Gi # Based on default of 3 files at 500Mi
