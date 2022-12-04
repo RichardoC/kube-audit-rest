@@ -8,9 +8,8 @@ kube-audit-rest
 # Ignore tmp so certs/etc not leaked
 tmp/
 
-
 # Ignore circleci
 .circleci
 
 # Docker
-Dockerfile
+Dockerfile*

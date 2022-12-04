@@ -90,6 +90,8 @@ The application logs will be full of the following error, and you will *not* get
 * test properly rather than use sleeps to manage async things...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
 * have workflow to test that docker image can be created once a maintainer adds a label to the PR.
+* document that image defaults to distroless
+* document this writes to default ephemeral 
 
 ## Completed next steps
 * Use flags for certs locations
