@@ -23,7 +23,10 @@ RUN mkdir /new-tmp
 
 FROM scratch
 
+# Application port
 EXPOSE 9090
+# Metrics port
+EXPOSE 55555
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 

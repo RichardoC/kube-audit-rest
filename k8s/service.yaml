@@ -10,7 +10,11 @@ spec:
   - name: https
     port: 443
     protocol: TCP
-    targetPort: 9090
+    targetPort: https
+  - name: metrics
+    port: 55555
+    protocol: TCP
+    targetPort: metrics
   selector:
     app: kube-audit-rest
   sessionAffinity: None
