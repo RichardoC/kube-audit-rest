@@ -6,7 +6,6 @@ metadata:
   name: kube-audit-rest
   namespace: kube-audit-rest
 spec:
-  automountServiceAccountToken: false
   progressDeadlineSeconds: 600
   replicas: 3
   revisionHistoryLimit: 10
@@ -23,8 +22,9 @@ spec:
       labels:
         app: kube-audit-rest
     spec:
+      automountServiceAccountToken: false
       containers:
-      - image: "docker.io/richardoc/kube-audit-rest:${COMMIT}"
+      - image: "docker.io/richardoc/kube-audit-rest:${COMMIT}-distroless"
         imagePullPolicy: IfNotPresent
         name: kube-audit-rest
         ports:
@@ -39,13 +39,14 @@ spec:
           mountPath: "/tmp"
         securityContext:
           allowPrivilegeEscalation: false
-          runAsUser: 255999 # Already true in the container, but does no harm to be explicit
-          runAsGroup: 255999
-          fsGroup: 255999
           readOnlyRootFilesystem: true
           capabilities:
             drop: 
             - ALL 
+      securityContext:
+        runAsUser: 255999 # Already true in the container, but does no harm to be explicit
+        runAsGroup: 255999
+        fsGroup: 255999
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
