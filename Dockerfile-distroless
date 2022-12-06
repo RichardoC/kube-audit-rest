@@ -2,7 +2,8 @@
 FROM golang@sha256:d171aa333fb386089206252503bc6ab545072670e0286e3d1bbc644362825c6e as builder
 
 # Can be removed once testing done from go rather than bash
-RUN apk add --no-cache bash diffutils git jq openssl
+# gcc and libc-dev needed for go vet
+RUN apk add --no-cache bash diffutils gcc libc-dev git jq openssl
 
 WORKDIR /src/github.com/RichardoC/kube-audit-rest
 
@@ -12,12 +13,12 @@ RUN go mod download
 
 COPY . .
 
-RUN go build .
-
-RUN CGO_ENABLED=0 GOOS=linux go build .
+RUN go vet .
 
 # Do simple local testing
 RUN ./testing/locally/local-testing.sh
+
+RUN CGO_ENABLED=0 GOOS=linux go build .
 
 RUN mkdir /new-tmp
 
@@ -30,7 +31,7 @@ EXPOSE 55555
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=builder /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest
+COPY --from=builder /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest /kube-audit-rest
 
 # Required as distroless doesn't contain a tmp dir
 COPY --from=builder /new-tmp /tmp
@@ -38,4 +39,4 @@ COPY --from=builder /new-tmp /tmp
 USER 255999
 
 
-CMD ["/src/github.com/RichardoC/kube-audit-rest/kube-audit-rest"]
+CMD ["/kube-audit-rest"]

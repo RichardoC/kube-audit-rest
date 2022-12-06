@@ -28,7 +28,7 @@ cat k8s/deployment.yaml | envsubst | kubectl -n kube-audit-rest apply -f -
 kubectl -n kube-audit-rest apply -f k8s/service.yaml
 
 # Substitute in the correct CA into the webhook
-export CABUNDLEB64="$(cat tmp/rootCA.pem | base64 -w0| tr -d '\n')"
+export CABUNDLEB64="$(cat tmp/rootCA.pem | base64 | tr -d '\n')"
 cat k8s/webhook.yaml | envsubst | kubectl -n kube-audit-rest apply -f -
 unset CABUNDLEB64
 

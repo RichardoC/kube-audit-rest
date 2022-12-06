@@ -7,7 +7,7 @@ metadata:
   namespace: kube-audit-rest
 spec:
   progressDeadlineSeconds: 600
-  replicas: 3
+  replicas: 1 # Can be HA
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -27,6 +27,8 @@ spec:
       - image: "ghcr.io/richardoc/kube-audit-rest:${COMMIT}-distroless"
         imagePullPolicy: IfNotPresent
         name: kube-audit-rest
+        command: # Adding example for overrides
+        - "/kube-audit-rest"
         ports:
         - containerPort: 9090
           protocol: TCP

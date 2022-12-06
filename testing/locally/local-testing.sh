@@ -19,10 +19,21 @@ rm -f tmp/kube-audit-rest.log;
 echo "Removing old servers if still running"
 pkill kube-audit-rest || echo "No old server running"
 
-# Run current server with those local certs on port 9090
-go run . --cert-filename=./tmp/server.crt --cert-key-filename=./tmp/server.key --server-port=9090 --logger-filename=./tmp/kube-audit-rest.log &
+if [[ "$(uname -m)" == 'x86_64' ]]
+then
+    # Run current server with those local certs on port 9090
+    # With race detection on x86_64
+    echo "Also doing race detection"
+    go run -race . --cert-filename=./tmp/server.crt --cert-key-filename=./tmp/server.key --server-port=9090 --logger-filename=./tmp/kube-audit-rest.log &
+else
+    # Run current server with those local certs on port 9090
+    go run . --cert-filename=./tmp/server.crt --cert-key-filename=./tmp/server.key --server-port=9090 --logger-filename=./tmp/kube-audit-rest.log &
+fi
 
-sleep 5 # Scientific way of waiting for the server to be ready...
+# Wait for server to run
+while ! nc -z localhost 9090; do   
+  sleep 1 # wait for 1/10 of the second before check again
+done
 
 go run testing/locally/main.go
 
