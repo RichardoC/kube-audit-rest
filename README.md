@@ -164,7 +164,6 @@ Kubernetes may not load balance between replicas of kube-audit-rest in the way y
 * follow GH best practises for workflows/etc
 * add prometheus metrics, particularly for total requests dealt with/request latency/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
-* test properly rather than use sleeps to manage async things...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
 * have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 
@@ -187,3 +186,5 @@ Kubernetes may not load balance between replicas of kube-audit-rest in the way y
 * clarify that kubernetes may not loadbalance between replicas as expected.
 * document that image defaults to distroless
 * add simple metrics
+* test properly rather than use sleeps to manage async things...
+* Correctly configure GOMAXPROCS to reduce unhelpful throttling

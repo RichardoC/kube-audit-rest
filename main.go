@@ -18,6 +18,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
+
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapio"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -173,6 +175,9 @@ func main() {
 	// Send standard logging to zap
 	undo := zap.RedirectStdLog(lg)
 	defer undo()
+
+	// Set maxprocs and have it use our nice logger
+	maxprocs.Set(maxprocs.Logger(logger.Infof))
 
 	var auditLogger io.Writer
 

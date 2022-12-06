@@ -2,7 +2,8 @@
 FROM golang@sha256:d171aa333fb386089206252503bc6ab545072670e0286e3d1bbc644362825c6e as builder
 
 # Can be removed once testing done from go rather than bash
-RUN apk add --no-cache bash diffutils git jq openssl
+# gcc and libc-dev needed for go vet
+RUN apk add --no-cache bash diffutils gcc libc-dev git jq openssl
 
 WORKDIR /src/github.com/RichardoC/kube-audit-rest
 
@@ -12,14 +13,13 @@ RUN go mod download
 
 COPY . .
 
-RUN go build .
 
-RUN CGO_ENABLED=0 GOOS=linux go build .
+RUN go vet .
 
 # Do simple local testing
 RUN ./testing/locally/local-testing.sh
 
-# TODO offer scratch as an option
+RUN CGO_ENABLED=0 GOOS=linux go build .
 
 # alpine:3.16
 FROM alpine@sha256:b95359c2505145f16c6aa384f9cc74eeff78eb36d308ca4fd902eeeb0a0b161b
@@ -31,10 +31,10 @@ EXPOSE 55555
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY --from=builder /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest
+COPY --from=builder /src/github.com/RichardoC/kube-audit-rest/kube-audit-rest /kube-audit-rest
 
 USER 255999
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
-CMD ["/src/github.com/RichardoC/kube-audit-rest/kube-audit-rest"]
+CMD ["/kube-audit-rest"]
