@@ -21,7 +21,10 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/${{ github.repository }}
-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: 'arm64'
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -59,3 +62,26 @@ jobs:
             ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless
             ghcr.io/richardoc/kube-audit-rest:latest
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push ARM64 alpine based image
+        uses: docker/build-push-action@v3
+        with:
+          file: Dockerfile-alpine
+          context: .
+          push: true # push the image to ghcr
+          tags: |
+            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: |-
+             linux/arm64
+      - name: Build and push ARM64 distroless image
+        uses: docker/build-push-action@v3
+        with:
+          file: Dockerfile-distroless
+          context: .
+          push: true # push the image to ghcr
+          tags: |
+            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless
+            ghcr.io/richardoc/kube-audit-rest:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: |-
+             linux/arm64
