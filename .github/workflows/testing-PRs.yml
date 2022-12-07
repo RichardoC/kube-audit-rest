@@ -10,12 +10,6 @@ jobs:
     name: Build and test via Docker 🐳 images 📦
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
@@ -29,8 +23,7 @@ jobs:
           context: .
           push: false # DO NOT PUSH AS UNTRUSTED
           tags: |
-            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine
-          labels: ${{ steps.meta.outputs.labels }}
+            ghcr.io/richardoc/kube-audit-rest:test-alpine
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -41,9 +34,8 @@ jobs:
           context: .
           push: false # DO NOT PUSH AS UNTRUSTED
           tags: |
-            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless
+            ghcr.io/richardoc/kube-audit-rest:test-distroless
             ghcr.io/richardoc/kube-audit-rest:latest
-          labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
