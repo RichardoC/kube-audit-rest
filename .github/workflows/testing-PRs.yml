@@ -1,6 +1,7 @@
 name: Test PRs
 on:
   pull_request:
+    # TODO, should run both when opened and updated
     types: [ labeled ] # So that only labelled PRs get run. https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 
 # Explicitly grant the `secrets.GITHUB_TOKEN` no permissions.
@@ -10,6 +11,8 @@ jobs:
     name: Build and test via Docker 🐳 images 📦
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Action
+        uses: actions/checkout@v2
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
