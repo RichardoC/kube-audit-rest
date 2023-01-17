@@ -46,8 +46,8 @@ spec:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           capabilities:
-            drop:
-            - ALL
+            drop: 
+            - ALL 
       securityContext:
         runAsUser: 255999 # Already true in the container, but does no harm to be explicit
         runAsGroup: 255999
@@ -59,5 +59,5 @@ spec:
         secret:
           secretName: kube-audit-rest
       - name: tmp
-        hostPath:
-          path: /tmp
+        emptyDir:
+          sizeLimit: 2Gi # Based on default of 3 files at 500Mi
