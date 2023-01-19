@@ -161,6 +161,9 @@ The application logs will be full of the following error, and you will *not* get
 
 Kubernetes may not load balance between replicas of kube-audit-rest in the way you expect as this behaviour appears to be undocumented.
 
+### Read only actions not logged
+
+Unfortunately the admission controllers are only called for mutations and creations, so this cannot be used to capture read only API calls.
 
 ## Next steps
 
@@ -169,7 +172,6 @@ Kubernetes may not load balance between replicas of kube-audit-rest in the way y
 * add prometheus metrics, particularly for total requests dealt with/request latency/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
-* have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 
 ## Completed next steps
 
@@ -192,3 +194,5 @@ Kubernetes may not load balance between replicas of kube-audit-rest in the way y
 * add simple metrics
 * test properly rather than use sleeps to manage async things...
 * Correctly configure GOMAXPROCS to reduce unhelpful throttling
+* have workflow to test that docker image can be created once a maintainer adds a label to the PR.
+* Make it clear this only tracks mutations due to limitations of the k8s api.
