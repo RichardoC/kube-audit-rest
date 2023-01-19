@@ -1,12 +1,12 @@
 # kube-audit-rest
 
 Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with EKS?
-Use kube-audit-rest to capture all API calls to disk, before exporting those to your logging infrastructure.
-This should be much cheaper than cloudtrail which charges ~ per API call and doesn't support ingestion filtering.  
+Use kube-audit-rest to capture all mutation/creation API calls to disk, before exporting those to your logging infrastructure.
+This should be much cheaper than cloudtrail which charges ~ per API call and doesn't support ingestion filtering.
 
 ## What this is
 
-A simple logger of requests to the k8s api.
+A simple logger of mutation/creation requests to the k8s api.
 
 ## What this isn't
 
@@ -98,7 +98,7 @@ Requires nerdctl and rancher desktop as a way of building/testing locally with k
 Run via the Building commands, then the following should contain various admission requests
 
 ```bash
-kubectl -n kube-audit-rest logs -l app=kube-audit-rest 
+kubectl -n kube-audit-rest logs -l app=kube-audit-rest
 ```
 
 Confirm that the k8s API is happy with this webhook (log location may vary, check Rancher Desktop docs)
@@ -149,6 +149,8 @@ This webhook will also record dry-run requests.
 The audit log files will only exist if valid API calls are sent to the webhook binary.
 
 API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy) and thus may not be in chronological order.
+
+WARNING: This can only log mutation/creation requests. Read Only requests are *not* sent to mutating or validating webhooks unfortunately.
 
 ### Certificate expires/invalid
 
