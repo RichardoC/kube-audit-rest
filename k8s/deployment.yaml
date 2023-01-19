@@ -29,6 +29,15 @@ spec:
         name: kube-audit-rest
         command: # Adding example for overrides
         - "/kube-audit-rest"
+        args:
+        - "--logger-max-backups=1" # Example of reducing number of files stored
+        resources:
+          requests:
+            cpu:  "2m"
+            memory: "10Mi"
+          limits:
+            cpu: "1"
+            memory: "32Mi"
         ports:
         - containerPort: 9090
           protocol: TCP

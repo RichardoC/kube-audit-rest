@@ -1,6 +1,6 @@
 ---
 apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
+kind: ValidatingWebhookConfiguration # Can also be a MutatingWebhookConfiguration if required
 metadata:
   name: kube-audit-rest
   labels:
@@ -16,7 +16,7 @@ webhooks:
         namespace: kube-audit-rest
         path: "/log-request"
       caBundle: "$CABUNDLEB64" # To be replaced
-    rules:
+    rules: # To be reduced as needed
       - operations: [ "*" ]
         apiGroups: ["*"]
         apiVersions: ["*"]

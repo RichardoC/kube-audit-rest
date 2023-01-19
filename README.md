@@ -1,8 +1,8 @@
 # kube-audit-rest
 
-Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with EKS?
+Want to get a kubernetes audit log without having the ability to configure the kube-api-server such as with [EKS](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html), [GKE](https://issuetracker.google.com/issues/185868707) or [AKS](https://learn.microsoft.com/en-us/azure/aks/monitor-aks#collect-resource-logs)?
 Use kube-audit-rest to capture all mutation/creation API calls to disk, before exporting those to your logging infrastructure.
-This should be much cheaper than cloudtrail which charges ~ per API call and doesn't support ingestion filtering.
+This should be much cheaper than the Cloud Service Provider managed offerings which charges ~ per API call and don't support ingestion filtering.
 
 ## What this is
 
@@ -57,6 +57,8 @@ Help Options:
 ### Resource requirements
 
 Unknown, if anyone performs benchmarks please open a pull request with your findings. These can be set by following the instructions [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+
+Current values seem to deal with > 12 requests per second.
 
 ### Limiting which requests are logged
 
