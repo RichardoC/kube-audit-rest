@@ -4,13 +4,18 @@ Want to get a kubernetes audit log without having the ability to configure the k
 Use kube-audit-rest to capture all mutation/creation API calls to disk, before exporting those to your logging infrastructure.
 This should be much cheaper than the Cloud Service Provider managed offerings which charges ~ per API call and don't support ingestion filtering.
 
+This tool is maintained and originally created by [Richard Tweed](https://github.com/RichardoC)
+
+
 ## What this is
 
 A simple logger of mutation/creation requests to the k8s api.
 
+
 ## What this isn't
 
 A filtering/redaction/forwarder system. That's for the user to do.
+
 
 ## Kubernetes distribution compatibility
 
@@ -54,15 +59,18 @@ Help Options:
   -h, --help                Show this help message
 ```
 
+
 ### Resource requirements
 
 Unknown, if anyone performs benchmarks please open a pull request with your findings. These can be set by following the instructions [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
 
 Current values seem to deal with > 12 requests per second.
 
+
 ### Limiting which requests are logged
 
 In your `ValidatingWebhookConfiguration` use the limited amount of resources and verbs you wish to log, rather than the `*`s in `./k8s/webhook.yaml` using the [Kubernetes documentation](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-configuration)
+
 
 ## API spec for kube-audit-rest output
 
@@ -71,6 +79,7 @@ This is the raw [AdmissionRequest](https://github.com/kubernetes/api/blob/master
 An easier version of this to interact with can be found [here](https://github.com/yannh/kubernetes-json-schema/)
 
 kube-audit-rest should log one request per line, in compacted json.
+
 
 ## Metrics
 kube-audit-rest provide some metrics describing its own operations, both as an application specifically and as a go binary. .
@@ -84,6 +93,7 @@ All the specific application metrics are prefixed with `kube_audit_rest_`.
 
 kube-audit-rest also exposes all default go metrics from the (Prometheus Go collector)[https://github.com/prometheus/client_golang/blob/main/prometheus/go_collector.go]
 
+
 ## Building
 
 Requires nerdctl and rancher desktop as a way of building/testing locally with k8s.
@@ -94,6 +104,7 @@ Requires nerdctl and rancher desktop as a way of building/testing locally with k
 # To cleanup
 ./testing/cleanup.sh
 ```
+
 
 ### Testing
 
@@ -119,6 +130,7 @@ E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-au
 
 ```
 
+
 ### Local testing
 
 ```bash
@@ -131,6 +143,7 @@ Terminated
 ```
 
 If this failed, you will see `output not as expected`
+
 
 ## Known limitations and warnings
 
@@ -154,6 +167,7 @@ API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [
 
 WARNING: This can only log mutation/creation requests. Read Only requests are *not* sent to mutating or validating webhooks unfortunately.
 
+
 ### Certificate expires/invalid
 
 The application logs will be full of the following error, and you will *not* get any more audit logs until this is fixed.
@@ -161,9 +175,13 @@ The application logs will be full of the following error, and you will *not* get
 
 Kubernetes may not load balance between replicas of kube-audit-rest in the way you expect as this behaviour appears to be undocumented.
 
+
 ### Read only actions not logged
 
 Unfortunately the admission controllers are only called for mutations and creations, so this cannot be used to capture read only API calls.
+
+Some well behaved API clients will create a `SubjectAccessReview` before making any API call. These can be used to spot all API calls made by those clients, but this is not required (and most clients don't.)
+
 
 ## Next steps
 
@@ -172,6 +190,7 @@ Unfortunately the admission controllers are only called for mutations and creati
 * add prometheus metrics, particularly for total requests dealt with/request latency/invalid certificate refusal from client as this probably needs an alert as the cert needs replaced...
 * make it clear just how bad an idea stdout is, preferably with a PoC exploit of using that to take over a cluster via logs...
 * have the testing main.go spin up/shut down the binaries rather than using bash and make it clearer that diff is required.
+
 
 ## Completed next steps
 
