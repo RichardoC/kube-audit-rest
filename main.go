@@ -136,7 +136,7 @@ type Options struct {
 	LoggerFilename   string `long:"logger-filename" description:"Location to log audit log to" default:"/tmp/kube-audit-rest.log"`
 	AuditToStdErr    bool   `long:"audit-to-std-log" description:"Not recommended - log to stderr/stdout rather than a file"`
 	LoggerMaxSize    int    `long:"logger-max-size" description:"Maximum size for each log file in megabytes" default:"500"`
-	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store" default:"3"`
+	LoggerMaxBackups int    `long:"logger-max-backups" description:"Maximum number of rolled log files to store, 0 means store all rolled files" default:"1"`
 	CertFilename     string `long:"cert-filename" description:"Location of certificate for TLS" default:"/etc/tls/tls.crt"`
 	CertKeyFilename  string `long:"cert-key-filename" description:"Location of certificate key for TLS" default:"/etc/tls/tls.key"`
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`

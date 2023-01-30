@@ -49,7 +49,7 @@ Application Options:
       --logger-filename=    Location to log audit log to (default: /tmp/kube-audit-rest.log)
       --audit-to-std-log    Not recommended - log to stderr/stdout rather than a file
       --logger-max-size=    Maximum size for each log file in megabytes (default: 500)
-      --logger-max-backups= Maximum number of rolled log files to store (default: 3)
+      --logger-max-backups= Maximum number of rolled log files to store, 0 means store all rolled files (default: 1)
       --cert-filename=      Location of certificate for TLS (default: /etc/tls/tls.crt)
       --cert-key-filename=  Location of certificate key for TLS (default: /etc/tls/tls.key)
       --server-port=        Port to run https server on (default: 9090)
