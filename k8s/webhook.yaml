@@ -20,11 +20,6 @@ webhooks:
       - operations: [ "*" ]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["*"]
-        scope: "*"
-      # Required due to https://github.com/kubernetes/kubernetes/issues/115523
-      - apiGroups: ["*"]
-        apiVersions: ["*"]
-        operations: ["*"]
-        resources: ["pods/exec", "pods/attach", "pods/portforward"]      
+        resources: ["*/*"]
+        scope: "*"     
     admissionReviewVersions: ["v1"]
