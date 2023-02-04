@@ -167,6 +167,8 @@ API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [
 
 WARNING: This can only log mutation/creation requests. Read Only requests are *not* sent to mutating or validating webhooks unfortunately.
 
+WARNING: "pods/exec", "pods/attach", "pods/portforward" must be explicitly listed as a rule for them to be recorded, due to <https://github.com/kubernetes/kubernetes/issues/115523>
+
 
 ### Certificate expires/invalid
 
