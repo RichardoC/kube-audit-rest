@@ -74,11 +74,16 @@ In your `ValidatingWebhookConfiguration` use the limited amount of resources and
 
 ## API spec for kube-audit-rest output
 
-This is the raw [AdmissionRequest](https://github.com/kubernetes/api/blob/master/admission/v1/types.go#L39) request and can be parsed using that [schema](https://github.com/kubernetes/kubernetes/blob/master/api/openapi-spec/swagger.json)
-
-An easier version of this to interact with can be found [here](https://github.com/yannh/kubernetes-json-schema/)
+This is the [AdmissionRequest](https://kubernetes.io/docs/reference/config-api/apiserver-admission.v1/#admission-k8s-io-v1-AdmissionRequest) request with requestReceivedTimestamp injected in RFC3339 format (see #26 for why).
 
 kube-audit-rest should log one request per line, in compacted json.
+
+### Example
+
+```console
+{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"uid":"f452d444-9782-45ce-8eea-85e7c5a2801b","kind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"resource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"requestKind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"requestResource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"operation":"CREATE","userInfo":{"username":"system:admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","metadata":{"creationTimestamp":null,"managedFields":[{"manager":"steve","operation":"Update","apiVersion":"authorization.k8s.io/v1","time":"2022-11-30T17:46:52Z","fieldsType":"FieldsV1","fieldsV1":{"f:spec":{"f:resourceAttributes":{".":{},"f:group":{},"f:resource":{},"f:verb":{},"f:version":{}}}}}]},"spec":{"resourceAttributes":{"verb":"list","group":"helm.cattle.io","version":"v1","resource":"helmchartconfigs"}},"status":{"allowed":false}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1"}},"requestReceivedTimestamp":"2023-02-04T21:56:41.610688981Z"}
+{"kind":"AdmissionReview","apiVersion":"admission.k8s.io/v1","request":{"uid":"f3491090-1952-4c4f-8825-6a1d1738e709","kind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"resource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"requestKind":{"group":"authorization.k8s.io","version":"v1","kind":"SelfSubjectAccessReview"},"requestResource":{"group":"authorization.k8s.io","version":"v1","resource":"selfsubjectaccessreviews"},"operation":"CREATE","userInfo":{"username":"system:admin","groups":["system:masters","system:authenticated"]},"object":{"kind":"SelfSubjectAccessReview","apiVersion":"authorization.k8s.io/v1","metadata":{"creationTimestamp":null,"managedFields":[{"manager":"steve","operation":"Update","apiVersion":"authorization.k8s.io/v1","time":"2022-11-30T17:46:51Z","fieldsType":"FieldsV1","fieldsV1":{"f:spec":{"f:resourceAttributes":{".":{},"f:group":{},"f:resource":{},"f:verb":{},"f:version":{}}}}}]},"spec":{"resourceAttributes":{"verb":"list","group":"batch","version":"v1","resource":"jobs"}},"status":{"allowed":false}},"oldObject":null,"dryRun":false,"options":{"kind":"CreateOptions","apiVersion":"meta.k8s.io/v1"}},"requestReceivedTimestamp":"2023-02-04T21:56:41.409906164Z"}
+```
 
 
 ## Metrics

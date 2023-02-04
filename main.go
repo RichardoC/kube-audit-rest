@@ -31,6 +31,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thought-machine/go-flags"
 	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
@@ -54,14 +55,26 @@ const responseTemplate = `{
 }`
 
 func logRequest(requestBody []byte, auditLogger io.Writer) {
+
+	requestStr := string(requestBody)
+	updatedObj, err := addTimestamp(requestStr)
+	if err != nil {
+		logger.Debugw("failed to add timestamp", "error", err)
+	}
+
 	// Compact the json for single line use regardless of request prettiness
 	dst := &bytes.Buffer{}
-	json.Compact(dst, requestBody)
+	json.Compact(dst, []byte(updatedObj))
 
-	_, err := fmt.Fprintln(auditLogger, dst)
+	_, err = fmt.Fprintln(auditLogger, dst)
 	if err != nil {
 		logger.Error(err)
 	}
+}
+
+func addTimestamp(requestBody string) (string, error) {
+	currentTime := time.Now().Format(time.RFC3339Nano)
+	return sjson.Set(requestBody, "requestReceivedTimestamp", currentTime)
 }
 
 func logRequestHandler(w http.ResponseWriter, r *http.Request, auditLogger io.Writer) {

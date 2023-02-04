@@ -6,6 +6,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/thought-machine/go-flags v1.6.2
 	github.com/tidwall/gjson v1.14.4
+	github.com/tidwall/sjson v1.2.5
 	go.uber.org/automaxprocs v1.5.1
 	go.uber.org/zap v1.24.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

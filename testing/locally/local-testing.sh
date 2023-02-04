@@ -44,7 +44,15 @@ sleep 2 # Scientific way of waiting for the file to be written as async...
 # Removing backgrounded process
 pkill kube-audit-rest
 
+# Ensure every line has a requestReceivedTimestamp 
+if [ "$(cat tmp/kube-audit-rest.log | grep -c "requestReceivedTimestamp")" -ne "$(wc -l tmp/kube-audit-rest.log | cut -d ' '  -f 1)" ]; then
+    echo "output not as expected, not all lines contain requestReceivedTimestamp"
+    exit 1
+fi
+
+
 # Sort audit log by uid as it's the only guaranteed field, and kube-audit-rest doesn't guarantee request ordering
-cat tmp/kube-audit-rest.log | jq -s -c '. | sort_by(.request.uid) | .[]' > tmp/kube-audit-rest-sorted.log
+# Removing the requestReceivedTimestamp timestamp as it's not deterministic
+cat tmp/kube-audit-rest.log | jq -s -c '. | sort_by(.request.uid)| del(.[].requestReceivedTimestamp)| .[]' > tmp/kube-audit-rest-sorted.log
 
 diff testing/locally/data/kube-audit-rest-sorted.log tmp/kube-audit-rest-sorted.log && [ "$TEST_EXIT" -eq "0" ] && echo "Test passed" || bash -c 'echo "output not as expected" && exit 255'
