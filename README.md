@@ -150,6 +150,19 @@ Terminated
 If this failed, you will see `output not as expected`
 
 
+### Unit tests
+
+The individual components that create this application have unittests. To run them
+
+```
+go test ./...
+```
+
+## Guide for developers
+
+If you want to know how the project is structured and/or you want to colaborate in it, you can read the following
+document: [ForDevelopers](docs/ForDevelopers.md)
+
 ## Known limitations and warnings
 
 From the k8s documentation [see rules](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#validatingwebhook-v1-admissionregistration-k8s-io)
@@ -171,8 +184,6 @@ The audit log files will only exist if valid API calls are sent to the webhook b
 API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy) and thus may not be in chronological order.
 
 WARNING: This can only log mutation/creation requests. Read Only requests are *not* sent to mutating or validating webhooks unfortunately.
-
-WARNING: "pods/exec", "pods/attach", "pods/portforward" must be explicitly listed as a rule for them to be recorded, due to <https://github.com/kubernetes/kubernetes/issues/115523>
 
 
 ### Certificate expires/invalid
