@@ -19,14 +19,14 @@ rm -f tmp/kube-audit-rest.log;
 echo "Removing old servers if still running"
 pkill kube-audit-rest || echo "No old server running"
 
+SERVER_PORT=9090
+METRICS_PORT=55555
+
 if which python3
 then
     # Pick 2 random free ports
     SERVER_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()');
     METRICS_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()');
-else
-    SERVER_PORT=9090
-    METRICS_PORT=55555
 fi
 
 if [[ "$(uname -m)" == 'x86_64' ]]
