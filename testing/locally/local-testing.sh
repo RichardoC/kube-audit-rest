@@ -19,15 +19,21 @@ rm -f tmp/kube-audit-rest.log;
 echo "Removing old servers if still running"
 pkill kube-audit-rest || echo "No old server running"
 
-if which python3
-then
-    # Pick 2 random free ports
-    SERVER_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()');
-    METRICS_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()');
-else
-    SERVER_PORT=9090
-    METRICS_PORT=55555
-fi
+# Use a random unused ephemeral port
+function ephemeral_port() {
+  local -r min=49152 max=65535
+
+  while true; do
+    local port=$((RANDOM % (max - min + 1) + min))
+    if ! (echo >/dev/tcp/127.0.0.1/$port) >/dev/null 2>&1; then
+      echo "$port"
+      break
+    fi
+  done
+}
+
+export SERVER_PORT="$(ephemeral_port)"
+export METRICS_PORT="$(ephemeral_port)"
 
 if [[ "$(uname -m)" == 'x86_64' ]]
 then
