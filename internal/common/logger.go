@@ -16,9 +16,9 @@ const (
 	Prod
 )
 
-var Logger *zap.SugaredLogger = ConfigGlobalLogger(Dbg)
+var Logger *zap.SugaredLogger = NewLogger(Dbg)
 
-func ConfigGlobalLogger(cfg LogCfg) *zap.SugaredLogger {
+func NewLogger(cfg LogCfg) *zap.SugaredLogger {
 	var logger *zap.Logger
 	var err error
 
@@ -36,4 +36,8 @@ func ConfigGlobalLogger(cfg LogCfg) *zap.SugaredLogger {
 	}
 
 	return logger.Sugar()
+}
+
+func ConfigGlobalLogger(cfg LogCfg) {
+	Logger = NewLogger(cfg)
 }
