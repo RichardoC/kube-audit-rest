@@ -39,13 +39,15 @@ if [[ "$(uname -m)" == 'x86_64' ]]
 then
     # Run current server with those local certs on port $SERVER_PORT
     # With race detection on x86_64
+    # Redirecting output to confirm standard library logs redirected to
+    # structured logger to prevent repeats of #31
     echo "Also doing race detection"
     go run -race ./cmd/kube-audit-rest/main.go --cert-filename=./tmp/server.crt --cert-key-filename=./tmp/server.key \
-        --server-port="$SERVER_PORT" --metrics-port="$METRICS_PORT" --logger-filename=./tmp/kube-audit-rest.log &
+        --server-port="$SERVER_PORT" --metrics-port="$METRICS_PORT" --logger-filename=./tmp/kube-audit-rest.log  > ./tmp/kube-audit-rest-output.log  2>&1 &
 else
     # Run current server with those local certs on port $SERVER_PORT
     go run ./cmd/kube-audit-rest/main.go --cert-filename=./tmp/server.crt --cert-key-filename=./tmp/server.key \
-        --server-port="$SERVER_PORT" --metrics-port="$METRICS_PORT" --logger-filename=./tmp/kube-audit-rest.log &
+        --server-port="$SERVER_PORT" --metrics-port="$METRICS_PORT" --logger-filename=./tmp/kube-audit-rest.log  > ./tmp/kube-audit-rest-output.log  2>&1 &
 fi
 KUBE_AUDIT_PID=$!
 
@@ -73,5 +75,8 @@ fi
 # Sort audit log by uid as it's the only guaranteed field, and kube-audit-rest doesn't guarantee request ordering
 # Removing the requestReceivedTimestamp timestamp as it's not deterministic
 cat tmp/kube-audit-rest.log | jq -s -c '. | sort_by(.request.uid)| del(.[].requestReceivedTimestamp)| .[]' > tmp/kube-audit-rest-sorted.log
+
+# Making sure that we're capturing standard library logs via structured logging
+cat tmp/kube-audit-rest-output.log | grep "remote error: tls: bad certificate" | jq -e '.msg' > /dev/null || bash -c 'echo "output not as expected: failed to get standard library logs via structured logging" && exit 255'
 
 diff testing/locally/data/kube-audit-rest-sorted.log tmp/kube-audit-rest-sorted.log && [ "$TEST_EXIT" -eq "0" ] && echo "Test passed" || bash -c 'echo "output not as expected" && exit 255'
