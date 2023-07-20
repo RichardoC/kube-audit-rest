@@ -60,6 +60,7 @@ func main() {
 	}
 	defer common.Logger.Sync()
 
+
 	common.Logger.Infow("Got config", "config", opts)
 
 	// Set maxprocs and have it use our nice logger
