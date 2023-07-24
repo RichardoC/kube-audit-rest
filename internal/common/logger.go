@@ -40,4 +40,7 @@ func NewLogger(cfg LogCfg) *zap.SugaredLogger {
 
 func ConfigGlobalLogger(cfg LogCfg) {
 	Logger = NewLogger(cfg)
+	// Send standard logging to zap
+	// ignoring undo as we don't want to undo this
+	_ = zap.RedirectStdLog(Logger.Desugar())
 }
