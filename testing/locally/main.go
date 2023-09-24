@@ -21,7 +21,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -67,7 +66,7 @@ func main() {
 	}
 
 	// Set up for TLS
-	caCert, err := ioutil.ReadFile("tmp/rootCA.pem")
+	caCert, err := os.ReadFile("tmp/rootCA.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
