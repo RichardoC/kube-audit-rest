@@ -1,5 +1,5 @@
-# golang:1.20.4-alpine3.18
-FROM golang@sha256:0a03b591c358a0bb02e39b93c30e955358dadd18dc507087a3b7f3912c17fe13 as builder
+# golang:1.21.1-alpine3.18
+FROM golang@sha256:0c860c7ceba62231d0f99fb92e9d7c1577f26fea794a12c75756a8f64b146e45 as builder
 
 # Can be removed once testing done from go rather than bash
 # gcc and libc-dev needed for go vet
@@ -18,7 +18,7 @@ RUN go vet ./...
 # Do simple local testing
 RUN ./testing/locally/local-testing.sh
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOEXPERIMENT=loopvar go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
 
 RUN mkdir /new-tmp
 
