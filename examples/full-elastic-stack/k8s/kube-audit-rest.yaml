@@ -1,3 +1,35 @@
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-config
+data:
+  vector.yaml: |
+    sources:
+      audit-files:
+        type: file
+        include:
+          - /tmp/*
+    sinks:
+      elastic-sink:
+        type: elasticsearch
+        api_version: v8
+        bulk: 
+          index: example-kube-audit-rest-audit-events
+        inputs:
+          - audit-files
+        endpoints:
+        - https://example-kube-audit-rest-es-http.example-kube-audit-rest:9200
+        auth:
+          strategy: basic
+          user: elastic
+          password: "${ESP:?err}"
+        mode:
+          bulk
+        tls: # TODO: fix this to actually accept the ES self signed certificates
+          verify_certificate: false
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -27,8 +59,6 @@ spec:
       - image: ghcr.io/richardoc/kube-audit-rest:ad68f71978e8cd610b5b06769fab301cf9ee74d0-distroless@sha256:2444c1207156681c4ed04e7bb02662820c9bfb31b50e8fe5b0112b3f8f577d42
         imagePullPolicy: IfNotPresent
         name: kube-audit-rest
-        args:
-        - "--logger-max-backups=1" # Example of reducing number of files stored
         resources:
           requests:
             cpu:  "2m"
@@ -55,10 +85,21 @@ spec:
           capabilities:
             drop: 
             - ALL 
-      securityContext:
-        runAsUser: 255999 # Already true in the container, but does no harm to be explicit
-        runAsGroup: 255999
-        fsGroup: 255999
+      - name: vector
+        image: docker.io/timberio/vector:0.33.0-distroless-static@sha256:90e14483720ea7dfa5c39812a30f37d3bf3a94b6611787a0d14055b8ac31eb1f
+        env:
+        - name: ESP
+          valueFrom:
+            secretKeyRef:
+              name: example-kube-audit-rest-es-elastic-user
+              key: elastic
+        volumeMounts:
+        - name: tmp
+          mountPath: "/tmp"
+          readOnly: true
+        - name: vector-config
+          mountPath: "/etc/vector/"
+          readOnly: true
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
@@ -68,6 +109,9 @@ spec:
       - name: tmp
         emptyDir:
           sizeLimit: 2Gi # Based on default of 3 files at 500Mi
+      - name: vector-config
+        configMap:
+          name: vector-config
 ---
 apiVersion: v1
 kind: Service
@@ -97,8 +141,8 @@ metadata:
   labels:
     app: kube-audit-rest
 webhooks:
-  - name: kube-audit-rest.kube-audit-rest.svc.cluster.local
-    failurePolicy: Fail 
+  - name: kube-audit-rest.example-kube-audit-rest.svc.cluster.local
+    failurePolicy: Ignore 
     timeoutSeconds: 1 
     sideEffects: None
     clientConfig:
@@ -114,4 +158,3 @@ webhooks:
         resources: ["*/*"]
         scope: "*"     
     admissionReviewVersions: ["v1"]
-
