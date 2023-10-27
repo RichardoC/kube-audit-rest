@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-kube-audit-rest
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: example-kube-audit-rest
+  namespace: example-kube-audit-rest
+spec:
+  version: 8.10.4
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana-kube-audit-rest
+  namespace: example-kube-audit-rest
+spec:
+  version: 8.10.4
+  count: 1
+  elasticsearchRef:
+    name: example-kube-audit-rest
+  config: 
+    telemetry:
+      optIn: false
+
+
+---

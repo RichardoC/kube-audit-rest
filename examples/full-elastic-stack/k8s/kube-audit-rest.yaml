@@ -1,0 +1,117 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kube-audit-rest
+  name: kube-audit-rest
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1 # Can be HA
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: kube-audit-rest
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kube-audit-rest
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - image: ghcr.io/richardoc/kube-audit-rest:ad68f71978e8cd610b5b06769fab301cf9ee74d0-distroless@sha256:2444c1207156681c4ed04e7bb02662820c9bfb31b50e8fe5b0112b3f8f577d42
+        imagePullPolicy: IfNotPresent
+        name: kube-audit-rest
+        args:
+        - "--logger-max-backups=1" # Example of reducing number of files stored
+        resources:
+          requests:
+            cpu:  "2m"
+            memory: "10Mi"
+          limits:
+            cpu: "1"
+            memory: "32Mi"
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+          name: https
+        - containerPort: 55555
+          protocol: TCP
+          name: metrics
+        volumeMounts:
+        - name: certs
+          mountPath: "/etc/tls"
+          readOnly: true
+        - name: tmp
+          mountPath: "/tmp"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: 
+            - ALL 
+      securityContext:
+        runAsUser: 255999 # Already true in the container, but does no harm to be explicit
+        runAsGroup: 255999
+        fsGroup: 255999
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: certs
+        secret:
+          secretName: kube-audit-rest
+      - name: tmp
+        emptyDir:
+          sizeLimit: 2Gi # Based on default of 3 files at 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kube-audit-rest
+  name: kube-audit-rest
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  - name: metrics
+    port: 55555
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app: kube-audit-rest
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration # Can also be a MutatingWebhookConfiguration if required
+metadata:
+  name: kube-audit-rest
+  labels:
+    app: kube-audit-rest
+webhooks:
+  - name: kube-audit-rest.kube-audit-rest.svc.cluster.local
+    failurePolicy: Fail 
+    timeoutSeconds: 1 
+    sideEffects: None
+    clientConfig:
+      service:
+        name: kube-audit-rest
+        namespace: example-kube-audit-rest
+        path: "/log-request"
+      caBundle: "$CABUNDLEB64" # To be replaced
+    rules: # To be reduced as needed
+      - operations: [ "*" ]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*/*"]
+        scope: "*"     
+    admissionReviewVersions: ["v1"]
+
