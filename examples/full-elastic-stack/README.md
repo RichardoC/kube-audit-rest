@@ -1,6 +1,6 @@
 # Example - Running kube-audit-rest and ingesting events into elastic search
 
-After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster. 
+After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster using vector. 
 
 You'll be able to navigate around in kibana and get a feel for the schema used, and what is available form this tool.
 
