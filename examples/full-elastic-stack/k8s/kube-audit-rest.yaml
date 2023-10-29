@@ -11,6 +11,14 @@ data:
         type: file
         include:
           - /tmp/*
+    transforms:
+      audit-files-json-parser: 
+        inputs:
+          - audit-files
+        type: remap
+        source: |-
+          . = parse_json!(.message)
+          .timestamp = .requestReceivedTimestamp
     sinks:
       elastic-sink:
         type: elasticsearch
@@ -18,7 +26,7 @@ data:
         bulk: 
           index: example-kube-audit-rest-audit-events
         inputs:
-          - audit-files
+          - audit-files-json-parser
         endpoints:
         - https://example-kube-audit-rest-es-http.example-kube-audit-rest:9200
         auth:
@@ -133,28 +141,3 @@ spec:
     app: kube-audit-rest
   sessionAffinity: None
   type: ClusterIP
----
-apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration # Can also be a MutatingWebhookConfiguration if required
-metadata:
-  name: kube-audit-rest
-  labels:
-    app: kube-audit-rest
-webhooks:
-  - name: kube-audit-rest.example-kube-audit-rest.svc.cluster.local
-    failurePolicy: Ignore 
-    timeoutSeconds: 1 
-    sideEffects: None
-    clientConfig:
-      service:
-        name: kube-audit-rest
-        namespace: example-kube-audit-rest
-        path: "/log-request"
-      caBundle: "$CABUNDLEB64" # To be replaced
-    rules: # To be reduced as needed
-      - operations: [ "*" ]
-        apiGroups: ["*"]
-        apiVersions: ["*"]
-        resources: ["*/*"]
-        scope: "*"     
-    admissionReviewVersions: ["v1"]
