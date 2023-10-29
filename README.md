@@ -60,6 +60,11 @@ Help Options:
 ```
 
 
+### Example usage
+
+These can be found in the `examples` directory, and documented in this readme.
+
+
 ### Resource requirements
 
 Unknown, if anyone performs benchmarks please open a pull request with your findings. These can be set by following the instructions [here](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
@@ -233,3 +238,4 @@ Some well behaved API clients will create a `SubjectAccessReview` before making 
 * Correctly configure GOMAXPROCS to reduce unhelpful throttling
 * have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 * Make it clear this only tracks mutations due to limitations of the k8s api.
+* Show kube-audit-rest working with a full elastic stack
