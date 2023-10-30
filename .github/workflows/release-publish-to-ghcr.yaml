@@ -1,9 +1,8 @@
-name: Publish Docker 🐳 images 📦 to GitHub Container Registry
+name: Publish release's container images 📦 to GitHub Container Registry
 
 on:
-  push:
-    branches:
-      - 'main'
+  release:
+    types: [published]
 
 jobs:
   build-and-publish-to-ghcr:
@@ -12,7 +11,7 @@ jobs:
       # Grant the ability to write to GitHub Packages (push Docker images to
       # GitHub Container Registry).
       packages: write
-    name: Build and publish Docker 🐳 images 📦 to GitHub Container Registry
+    name: Build and publish container images 📦 to GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
@@ -53,7 +52,7 @@ jobs:
           context: .
           push: true # push the image to ghcr
           tags: |
-            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine
+            ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
@@ -65,11 +64,8 @@ jobs:
           context: .
           push: true # push the image to ghcr
           tags: |
-            ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless
-            ghcr.io/richardoc/kube-audit-rest:latest
+            ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-# Eventually cache will need to be cleared
-# https://github.com/docker/build-push-action/issues/252
