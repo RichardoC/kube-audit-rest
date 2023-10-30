@@ -1,5 +1,5 @@
-# golang:1.20.4-alpine3.18
-FROM golang@sha256:0a03b591c358a0bb02e39b93c30e955358dadd18dc507087a3b7f3912c17fe13 as builder
+# golang:1.21.1-alpine3.18
+FROM golang@sha256:0c860c7ceba62231d0f99fb92e9d7c1577f26fea794a12c75756a8f64b146e45 as builder
 
 # Can be removed once testing done from go rather than bash
 # gcc and libc-dev needed for go vet
@@ -19,10 +19,10 @@ RUN go vet ./...
 # Do simple local testing
 RUN ./testing/locally/local-testing.sh
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOEXPERIMENT=loopvar go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
 
-# alpine:3.18.0
-FROM alpine@sha256:c0669ef34cdc14332c0f1ab0c2c01acb91d96014b172f1a76f3a39e63d1f0bda
+# alpine:3.18.3
+FROM alpine@sha256:c5c5fda71656f28e49ac9c5416b3643eaa6a108a8093151d6d1afc9463be8e33
 
 # Application port
 EXPOSE 9090

@@ -21,7 +21,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -46,8 +45,28 @@ func main() {
 
 	testFailureCount := 0
 
+	// send a request which doesn't trust our CA
+	// Set up custom http client so we can correctly validate TLS
+	clientFaulty := &http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				if addr == fmt.Sprintf("kube-audit-rest:%d", opts.ServerPort) {
+					addr = fmt.Sprintf("127.0.0.1:%d", opts.ServerPort)
+				}
+				dialer := &net.Dialer{}
+				return dialer.DialContext(ctx, network, addr)
+			},
+		},
+	}
+	_, err = clientFaulty.Post((fmt.Sprintf("https://kube-audit-rest:%d/log-request", opts.ServerPort)), "application/json", bytes.NewReader([]byte("abc")))
+
+	if !strings.Contains(err.Error(), "failed to verify certificate") {
+		log.Println("error: didn't fail when go doesn't trust the CA.")
+		testFailureCount++
+	}
+
 	// Set up for TLS
-	caCert, err := ioutil.ReadFile("tmp/rootCA.pem")
+	caCert, err := os.ReadFile("tmp/rootCA.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
