@@ -1,0 +1,25 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration # Can also be a MutatingWebhookConfiguration if required
+metadata:
+  name: kube-audit-rest
+  labels:
+    app: kube-audit-rest
+webhooks:
+  - name: kube-audit-rest.example-kube-audit-rest.svc.cluster.local
+    failurePolicy: Ignore 
+    timeoutSeconds: 1 
+    sideEffects: None
+    clientConfig:
+      service:
+        name: kube-audit-rest
+        namespace: example-kube-audit-rest
+        path: "/log-request"
+      caBundle: "$CABUNDLEB64" # To be replaced
+    rules: # To be reduced as needed
+      - operations: [ "*" ]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*/*"]
+        scope: "*"     
+    admissionReviewVersions: ["v1"]
