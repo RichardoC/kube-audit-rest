@@ -74,6 +74,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.13.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless'
+          scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless"
           format: 'sarif'
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
@@ -86,6 +87,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.13.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine'
+          scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine"
           format: 'sarif'
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
