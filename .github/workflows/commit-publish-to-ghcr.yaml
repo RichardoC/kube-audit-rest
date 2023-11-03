@@ -72,3 +72,27 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Run Trivy vulnerability scanner for distroless container
+        uses: aquasecurity/trivy-action@v0.13.1
+        with:
+          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless'
+          format: 'sarif'
+          output: 'distroless-results.sarif'
+          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Upload Trivy distroless scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'alpine-results.sarif'
+          category: 'trivy'
+      - name: Run Trivy vulnerability scanner for alpine container
+        uses: aquasecurity/trivy-action@v0.13.1
+        with:
+          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine'
+          format: 'sarif'
+          output: 'alpine-results.sarif'
+          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Upload Trivy alpine scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'alpine-results.sarif'
+          category: 'trivy'
