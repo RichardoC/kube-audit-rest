@@ -1,2 +1,3 @@
 tmp/*
 kube-audit-rest
+.DS_Store
