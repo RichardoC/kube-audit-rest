@@ -60,7 +60,7 @@ jobs:
       - name: Test
         run: go test -v ./...
   run-trivy:
-    name: Execute the unittests
+    name: Run trivy
     runs-on: ubuntu-latest
     steps:
       - name: Setup Action
