@@ -59,3 +59,18 @@ jobs:
 
       - name: Test
         run: go test -v ./...
+  run-trivy:
+    name: Execute the unittests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Action
+        uses: actions/checkout@v4.1.0
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'repo-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
