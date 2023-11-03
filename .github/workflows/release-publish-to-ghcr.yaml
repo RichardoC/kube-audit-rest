@@ -70,3 +70,45 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  static-scan-with-trivy:
+    # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
+    permissions:
+      # Grant the ability to write to GitHub Packages (push Docker images to
+      # GitHub Container Registry).
+      packages: write
+      # Needed to upload the code scanning results to code-scanning dashboard.
+      security-events: write
+      # Needed to upload dependency graph
+      contents: write
+
+    name: Run trivy on the repo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4.1.0
+        with:
+             fetch-depth: 1
+             fetch-tags: true
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'repo-results.sarif'
+          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Upload Trivy repo scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'repo-results.sarif'
+          category: 'trivy-repo'
+
+      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
+           
