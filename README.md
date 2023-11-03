@@ -14,7 +14,7 @@ A simple logger of mutation/creation requests to the k8s api.
 
 ## What this isn't
 
-A filtering/redaction/forwarder system. There are so many variants and each team does this differently that it's not possible to offer all options. Examples of using this with Elastic Search can be found in <examples/full-elastic-stack/README.md>
+A filtering/redaction/forwarder system. This can be done with many different tools, so this tool doesn't rely on any specific tooling. Examples of using kube-audit-rest with Elastic Search can be found in <examples/full-elastic-stack/README.md>
 
 
 ## Kubernetes distribution compatibility
