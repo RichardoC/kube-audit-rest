@@ -12,6 +12,9 @@ jobs:
       # Grant the ability to write to GitHub Packages (push Docker images to
       # GitHub Container Registry).
       packages: write
+      # Needed to upload the code scanning results to code-scanning dashboard.
+      security-events: write
+
     name: Build and publish container images 📦 to GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
