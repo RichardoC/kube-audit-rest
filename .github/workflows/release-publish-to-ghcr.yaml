@@ -87,8 +87,7 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4.1.0
         with:
-             fetch-depth: 1
-             fetch-tags: true
+             fetch-depth: 0
       - name: Run Trivy vulnerability scanner in fs mode
         uses: aquasecurity/trivy-action@master
         with:

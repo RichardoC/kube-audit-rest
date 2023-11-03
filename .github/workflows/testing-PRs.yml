@@ -8,7 +8,7 @@ on:
 permissions: {}
 jobs:
   AMD-test-via-docker:
-    name: Build and test via Docker 🐳 images 📦
+    name: AMD64 - Build and test via Docker 🐳 images 📦
     runs-on: ubuntu-latest
     steps:
       - name: Setup Action
@@ -39,7 +39,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
   ARM-test-via-docker:
-    name: Build and test via Docker 🐳 images 📦
+    name: ARM64 - Build and test via Docker 🐳 images 📦
     runs-on: ubuntu-latest
     steps:
       - name: Setup Action
