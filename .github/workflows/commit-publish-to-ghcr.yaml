@@ -85,7 +85,7 @@ jobs:
       - name: Upload Trivy distroless scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'alpine-results.sarif'
+          sarif_file: 'distroless-results.sarif'
           category: 'trivy'
       - name: Run Trivy vulnerability scanner for alpine container
         uses: aquasecurity/trivy-action@0.13.1
