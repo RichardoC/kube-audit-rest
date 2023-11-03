@@ -76,6 +76,11 @@ Generated container images will be pushed for every commit, so you can experimen
 Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `<version>-alpine`
 
 
+#### latest
+
+This points to the latest `<version>-distroless` image and is only recommended for demo purposes. Use versioned images for stable usage.
+
+
 ### Binary options
 
 ```bash

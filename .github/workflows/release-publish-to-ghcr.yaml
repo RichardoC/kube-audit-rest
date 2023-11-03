@@ -65,6 +65,7 @@ jobs:
           push: true # push the image to ghcr
           tags: |
             ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless
+            ghcr.io/richardoc/kube-audit-rest:latest
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
