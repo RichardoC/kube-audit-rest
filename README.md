@@ -14,7 +14,7 @@ A simple logger of mutation/creation requests to the k8s api.
 
 ## What this isn't
 
-A filtering/redaction/forwarder system. That's for the user to do.
+A filtering/redaction/forwarder system. This can be done with many different tools, so this tool doesn't rely on any specific tooling. Examples of using kube-audit-rest with Elastic Search can be found in <examples/full-elastic-stack/README.md>
 
 
 ## Kubernetes distribution compatibility
@@ -36,6 +36,49 @@ At minimum you require
 If you are running kube-audit-rest within the kubernetes cluster it is auditing you also require
 * a deployment of kube-audit-rest running
 * a service targeting the kube-audit-rest pods
+
+
+## Image variants
+
+kube-audit-rest images come in many flavors, each designed for a specific use case. 
+
+These are all available for linux/amd64 and linux/arm64 
+
+
+### Available container tags
+
+While the tags below exist, it is recommended to pin to the digest of the container image you wish to use, these can be found on <https://github.com/RichardoC/kube-audit-rest/pkgs/container/kube-audit-rest/>
+
+
+#### <version>-distroless
+
+This is the preferred image for production usage, it only contains the required kube-audit-rest binary, and nothing else.
+
+This means it has the minimum size (~ 14 MB) and number of container layers which decreases image pull time.
+
+Since it doesn't contain an OS, or any other packages this will contain the minimum possible (reported) vulnerabilities.
+
+
+#### <version>-alpine
+
+This is the preferred image for development usage, it contains the required kube-audit-rest binary, and uses a default alpine image containing a shell.
+
+This is larger, but since it contains a shell and other useful utilities it's the best one for experimenting with kube-audit-rest and diagnosing issues.
+
+
+#### <commit>-distroless
+
+Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `<version>-distroless`
+
+
+#### <commit>-alpine
+
+Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `<version>-alpine`
+
+
+#### latest
+
+This points to the latest `<commit>-distroless` image and is only recommended for demo purposes. Use versioned images for stable usage.
 
 
 ### Binary options
@@ -62,7 +105,7 @@ Help Options:
 
 ### Example usage
 
-These can be found in the `examples` directory, and documented in this readme.
+These can be found in the <./examples> directory, and documented in this readme.
 
 
 ### Resource requirements
@@ -81,7 +124,7 @@ In your `ValidatingWebhookConfiguration` use the limited amount of resources and
 
 This is the [AdmissionRequest](https://kubernetes.io/docs/reference/config-api/apiserver-admission.v1/#admission-k8s-io-v1-AdmissionRequest) request with requestReceivedTimestamp injected in RFC3339 format (see #26 for why).
 
-kube-audit-rest should log one request per line, in compacted json.
+kube-audit-rest will log one request per line, in compacted json.
 
 ### Example
 
@@ -142,6 +185,8 @@ E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-au
 
 
 ### Local testing
+
+This requires the [go toolchain for Go 1.21+](https://go.dev/doc/install), openssl and bash installed.
 
 ```bash
 testing/locally/local-testing.sh
