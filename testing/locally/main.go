@@ -60,8 +60,8 @@ func main() {
 	}
 	_, err = clientFaulty.Post((fmt.Sprintf("https://kube-audit-rest:%d/log-request", opts.ServerPort)), "application/json", bytes.NewReader([]byte("abc")))
 
-	if !strings.Contains(err.Error(), "failed to verify certificate") {
-		log.Println("error: didn't fail when go doesn't trust the CA.")
+	if !strings.Contains(err.Error(), "x509: certificate signed by unknown authority") {
+		log.Println("error: didn't fail when go doesn't trust the CA. instead got ", err.Error())
 		testFailureCount++
 	}
 
@@ -111,9 +111,8 @@ func main() {
 		if err != nil {
 			log.Println("Error while testing the happy path")
 			testFailureCount += 1
-			log.Println(err)
-		} else {
 			log.Println(resp)
+			log.Println(err)
 		}
 
 	}
@@ -126,8 +125,6 @@ func main() {
 		log.Println("Error while executing \"Send a totally invalid request\"")
 		testFailureCount += 1
 		log.Println(err)
-	} else {
-		log.Println(resp)
 	}
 
 	// Send an almost valid request, but missing the uid
@@ -137,8 +134,6 @@ func main() {
 		log.Println("Error while executing \"Send an almost valid request, but missing the uid\"")
 		testFailureCount += 1
 		log.Println(err)
-	} else {
-		log.Println(resp)
 	}
 
 	// Send something that isn't json
@@ -147,8 +142,6 @@ func main() {
 		log.Println("Error while executing \"Send something that isn't json\"")
 		testFailureCount += 1
 		log.Println(err)
-	} else {
-		log.Println(resp)
 	}
 
 	// Don't say we're sending json
@@ -157,8 +150,6 @@ func main() {
 		log.Println("Error while executing \"Don't say we're sending json\"")
 		testFailureCount += 1
 		log.Println(err)
-	} else {
-		log.Println(resp)
 	}
 
 	// Ensure metrics server running
@@ -177,6 +168,7 @@ func main() {
 	}
 
 	if testFailureCount > 0 {
+		log.Println(testFailureCount, " tests failed")
 		os.Exit(255)
 	}
 }
