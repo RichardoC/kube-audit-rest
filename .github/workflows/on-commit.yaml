@@ -186,7 +186,7 @@ jobs:
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'trivy-alpine-ARM64'
-  Static scan with trivy:
+  static-scan-with-trivy:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
       # Grant the ability to write to GitHub Packages (push Docker images to
