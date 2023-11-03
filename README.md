@@ -14,7 +14,7 @@ A simple logger of mutation/creation requests to the k8s api.
 
 ## What this isn't
 
-A filtering/redaction/forwarder system. There are so many variants and each team does this differently that it's not possible to offer all options. Examples of using this with Elastic Search can be found in `examples/full-elastic-stack/README.md`
+A filtering/redaction/forwarder system. There are so many variants and each team does this differently that it's not possible to offer all options. Examples of using this with Elastic Search can be found in <examples/full-elastic-stack/README.md>
 
 
 ## Kubernetes distribution compatibility
@@ -105,7 +105,7 @@ Help Options:
 
 ### Example usage
 
-These can be found in the `examples` directory, and documented in this readme.
+These can be found in the <./examples> directory, and documented in this readme.
 
 
 ### Resource requirements
@@ -185,6 +185,8 @@ E1127 13:35:04.936459    3402 dispatcher.go:149] failed calling webhook "kube-au
 
 
 ### Local testing
+
+This requires the [go toolchain for Go 1.21+](https://go.dev/doc/install), openssl and bash installed.
 
 ```bash
 testing/locally/local-testing.sh
