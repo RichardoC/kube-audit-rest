@@ -7,7 +7,38 @@ on:
 # Explicitly grant the `secrets.GITHUB_TOKEN` no permissions.
 permissions: {}
 jobs:
-  test-via-docker:
+  AMD-test-via-docker:
+    name: Build and test via Docker 🐳 images 📦
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Action
+        uses: actions/checkout@v4.1.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.0.0
+      - name: Build alpine based image
+        uses: docker/build-push-action@v5.0.0
+        with:
+          file: Dockerfile-alpine
+          context: .
+          push: false # DO NOT PUSH AS UNTRUSTED
+          tags: |
+            ghcr.io/richardoc/kube-audit-rest:test-alpine
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build distroless image
+        uses: docker/build-push-action@v5.0.0
+        with:
+          file: Dockerfile-distroless
+          context: .
+          push: false # DO NOT PUSH AS UNTRUSTED
+          tags: |
+            ghcr.io/richardoc/kube-audit-rest:test-distroless
+            ghcr.io/richardoc/kube-audit-rest:latest
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  ARM-test-via-docker:
     name: Build and test via Docker 🐳 images 📦
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +58,7 @@ jobs:
           push: false # DO NOT PUSH AS UNTRUSTED
           tags: |
             ghcr.io/richardoc/kube-audit-rest:test-alpine
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Build distroless image
