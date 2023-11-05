@@ -1,8 +1,12 @@
 name: Test PRs
 on:
   pull_request:
-    # TODO, should run both when opened and updated
-    types: [ labeled ] # So that only labelled PRs get run. https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    - labeled
+    - opened
+    - edited
+    - reopened
+    - synchronize
+    - ready_for_review
 
 # Explicitly grant the `secrets.GITHUB_TOKEN` no permissions.
 permissions: {}
