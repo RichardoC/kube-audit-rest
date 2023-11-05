@@ -2,8 +2,11 @@
 kube-audit-rest
 
 # Ignore git directories
-# .git
+.git
 .gitignore
+
+# Ignore github directories
+.github
 
 # Ignore tmp so certs/etc not leaked
 tmp/
