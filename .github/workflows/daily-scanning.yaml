@@ -8,8 +8,6 @@ jobs:
   build-and-publish-result-to-ghcr:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
-      # Grant the ability to write to GitHub Packages (push Docker images to
-      # GitHub Container Registry).
       packages: read
       # Needed to upload the code scanning results to code-scanning dashboard.
       security-events: write
@@ -71,9 +69,7 @@ jobs:
   static-scan-with-trivy:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
-      # Grant the ability to write to GitHub Packages (push Docker images to
-      # GitHub Container Registry).
-      packages: write
+      packages: read
       # Needed to upload the code scanning results to code-scanning dashboard.
       security-events: write
       # Needed to upload dependency graph
