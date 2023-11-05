@@ -20,8 +20,9 @@ jobs:
         with:
              fetch-depth: 0
       - name: Detect latest release
+        id: generate-container-name
         run: |
-          echo "latest_version=$(git tag --sort=-version:refname | head -n1)" >> "$GITHUB_ENV"
+          echo "latest_version=ghcr.io/richardoc/kube-audit-rest:$(git tag --sort=-version:refname | head -n1)" >> "$GITHUB_ENV"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -44,8 +45,8 @@ jobs:
       - name: Run Trivy vulnerability scanner for distroless container
         uses: aquasecurity/trivy-action@0.13.1
         with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${latest_version}-distroless'
-          scan-ref: "daily scan - ghcr.io/richardoc/kube-audit-rest:${latest_version}-distroless"
+          image-ref: '${{ steps.generate-container-name.latest_version }}-distroless'
+          scan-ref: "daily scan - ${{ steps.generate-container-name.latest_version }}-distroless"
           format: 'sarif'
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
@@ -57,8 +58,8 @@ jobs:
       - name: Run Trivy vulnerability scanner for alpine container
         uses: aquasecurity/trivy-action@0.13.1
         with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine'
-          scan-ref: "daily scan - ghcr.io/richardoc/kube-audit-rest:${latest_version}-alpine"
+          image-ref: '${{ steps.generate-container-name.latest_version }}-alpine'
+          scan-ref: "daily scan - ${{ steps.generate-container-name.latest_version }}-alpine"
           format: 'sarif'
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
