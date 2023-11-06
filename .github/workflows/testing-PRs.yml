@@ -1,12 +1,13 @@
 name: Test PRs
 on:
   pull_request:
-    - labeled
-    - opened
-    - edited
-    - reopened
-    - synchronize
-    - ready_for_review
+    types:
+      - labeled
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
 
 # Explicitly grant the `secrets.GITHUB_TOKEN` no permissions.
 permissions: {}
