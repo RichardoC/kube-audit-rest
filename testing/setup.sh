@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-ROOT=$(git rev-parse --show-toplevel)
+# Default to root if no .git missing
+ROOT=$(git rev-parse --show-toplevel || echo '.' )
 
 cd $ROOT
 
