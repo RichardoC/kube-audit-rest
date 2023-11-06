@@ -16,6 +16,12 @@ A simple logger of mutation/creation requests to the k8s api.
 
 A filtering/redaction/forwarder system. This can be done with many different tools, so this tool doesn't rely on any specific tooling. Examples of using kube-audit-rest with Elastic Search can be found in <examples/full-elastic-stack/README.md>
 
+## Why should I care?
+
+You can use kube-audit-rest to avoid bills of thousands of dollars per cluster per year for non-filterable Kubernetes audit logs.
+
+With kube-audit-rest you can configure exactly which events are recorded and directly send them to your SIEM, dramatically reducing storage and ingestion charges compared with only on/off configurations such as [EKS](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
+
 
 ## Kubernetes distribution compatibility
 
