@@ -76,9 +76,7 @@ func main() {
 	// Set up custom http client so we can correctly validate TLS
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
-			},
+			TLSClientConfig: &tls.Config{ RootCAs: caCertPool, MinVersion: tls.VersionTLS13 },
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 				if addr == fmt.Sprintf("kube-audit-rest:%d", opts.ServerPort) {
 					addr = fmt.Sprintf("127.0.0.1:%d", opts.ServerPort)

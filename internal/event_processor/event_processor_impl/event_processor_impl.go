@@ -1,7 +1,7 @@
 package eventprocessorimpl
 
 import (
-	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 
@@ -18,15 +18,16 @@ const responseTemplate = `{
 	"apiVersion": "admission.k8s.io/v1",
 	"kind": "AdmissionReview",
 	"response": {
-		"uid": "%s",
+		"uid": "{{.}}",
 		"allowed": true
 	}
 }`
 
 type eventProcImpl struct {
-	validReqProc metrics.Counter
-	totalReq     metrics.Counter
-	eventWritter auditwriter.AuditWritter
+	validReqProc     metrics.Counter
+	totalReq         metrics.Counter
+	eventWritter     auditwriter.AuditWritter
+	responseTemplate template.Template
 }
 
 func New(eventWritter auditwriter.AuditWritter, metricsServer metrics.MetricsServer) eventprocessor.EventProcessor {
@@ -38,10 +39,12 @@ func New(eventWritter auditwriter.AuditWritter, metricsServer metrics.MetricsSer
 		"kube_audit_rest_http_requests_total",
 		"Total number of requests to kube-audit-rest",
 	)
+	tmpl, _ := template.New("name").Parse(responseTemplate) // TODO fix error handling
 	return &eventProcImpl{
-		validReqProc: validReqProc,
-		totalReq:     totalReq,
-		eventWritter: eventWritter,
+		validReqProc:     validReqProc,
+		totalReq:         totalReq,
+		eventWritter:     eventWritter,
+		responseTemplate: *tmpl,
 	}
 }
 
@@ -97,5 +100,8 @@ func (ep *eventProcImpl) ProcessEvent(w http.ResponseWriter, r *http.Request) {
 	ep.validReqProc.Inc()
 
 	// Template the uid into our default approval and finish up
-	fmt.Fprintf(w, responseTemplate, requestUid)
+
+	ep.responseTemplate.Execute(w, requestUid)
+
+	// fmt.Fprintf(w, responseTemplate, requestUid)
 }

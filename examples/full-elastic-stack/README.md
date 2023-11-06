@@ -1,6 +1,6 @@
 # Example - Running kube-audit-rest and ingesting events into elastic search
 
-After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster using vector. 
+After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster using vector.
 
 You'll be able to navigate around in kibana and get a feel for the schema used, and what is available form this tool.
 
@@ -8,7 +8,7 @@ You'll be able to navigate around in kibana and get a feel for the schema used, 
 
 * Internet access
 
-* A kubernetes cluster 
+* A kubernetes cluster
     * which you have admin level privileges to
     * that you don't mind having to recreate
     * that doesn't already have elastic search operator running
@@ -43,7 +43,7 @@ kubectl apply -f examples/full-elastic-stack/k8s/elastic-cluster.yaml
 
 ```
 
-Check that an opator pod is running in elastic-system
+Check that an operator pod is running in elastic-system
 
 ```bash
 kubectl -n elastic-system get po
@@ -128,7 +128,7 @@ kubectl delete namespace test-namespace
 ## View the data in elastic search via kibana
 Navigate to <https://127.0.0.1:60443/app/discover#/> provided the port forward from earlier is still running, or restart it if required.
 
-Create a data view 
+Create a data view
 ```
 Name: example-kube-audit-rest-audit-events
 Index pattern: example-kube-audit-rest-audit-events
