@@ -73,7 +73,12 @@ func main() {
 	} else {
 		auditWriter = diskwriter.New(opts.LoggerFilename, opts.LoggerMaxSize, opts.LoggerMaxBackups)
 	}
-	eventProcessor := eventprocessorimpl.New(auditWriter, metricsServer)
+	eventProcessor, err := eventprocessorimpl.New(auditWriter, metricsServer)
+
+	if err != nil {
+		common.Logger.Fatalf("failed to start audit eventProcessor with: %s", err.Error())
+	}
+
 	httpListener := logrequestlistener.New(opts.ServerPort, opts.CertFilename, opts.CertKeyFilename, eventProcessor)
 
 	go metricsServer.Start()
