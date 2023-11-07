@@ -110,3 +110,14 @@ jobs:
           output: 'repo-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+  run-semgrep:
+    name: Run Semgrep
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Action
+        uses: actions/checkout@v4.1.1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.0.0
+      - name: Run semgrep
+        # excluding yamls due to false positives with the elasticsearch example for now
+        run: docker run --rm -v "${PWD}:/src" returntocorp/semgrep semgrep ci --config auto  --exclude=*.yaml 
