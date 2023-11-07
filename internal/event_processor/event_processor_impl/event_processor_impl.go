@@ -30,7 +30,7 @@ type eventProcImpl struct {
 	responseTemplate template.Template
 }
 
-func New(eventWritter auditwriter.AuditWritter, metricsServer metrics.MetricsServer) eventprocessor.EventProcessor {
+func New(eventWritter auditwriter.AuditWritter, metricsServer metrics.MetricsServer) (eventprocessor.EventProcessor, error) {
 	validReqProc := metricsServer.CreateAndRegisterCounter(
 		"kube_audit_rest_valid_requests_processed_total",
 		"Total number of valid requests processed",
@@ -39,13 +39,18 @@ func New(eventWritter auditwriter.AuditWritter, metricsServer metrics.MetricsSer
 		"kube_audit_rest_http_requests_total",
 		"Total number of requests to kube-audit-rest",
 	)
-	tmpl, _ := template.New("name").Parse(responseTemplate) // TODO fix error handling
+	tmpl, err := template.New("name").Parse(responseTemplate)
+
+	if err != nil {
+		return &eventProcImpl{}, err
+	}
+	
 	return &eventProcImpl{
 		validReqProc:     validReqProc,
 		totalReq:         totalReq,
 		eventWritter:     eventWritter,
 		responseTemplate: *tmpl,
-	}
+	}, nil
 }
 
 func (ep *eventProcImpl) ProcessEvent(w http.ResponseWriter, r *http.Request) {

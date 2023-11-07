@@ -57,7 +57,10 @@ func Test_WhenRequestWellFormatted_ThenResponseSent(t *testing.T) {
 
 	aw, ms := setup(t)
 	aw.EXPECT().LogEvent([]byte(correctBodyRequest))
-	ep := eventprocessorimpl.New(aw, ms)
+	ep, err := eventprocessorimpl.New(aw, ms)
+	if err != nil {
+		t.Errorf("creating event processor failed with : %s", err)
+	}
 
 	sendRequest(ep, header, correctBodyRequest)
 }
@@ -66,7 +69,10 @@ func Test_WhenBadHeader_ThenNoEventLogged(t *testing.T) {
 	header := make(map[string][]string)
 
 	aw, ms := setup(t)
-	ep := eventprocessorimpl.New(aw, ms)
+	ep, err := eventprocessorimpl.New(aw, ms)
+	if err != nil {
+		t.Errorf("creating event processor failed with : %s", err)
+	}
 
 	sendRequest(ep, header, correctBodyRequest)
 }
@@ -76,7 +82,11 @@ func Test_WhenInvalidJsonBody_ThenNoEventLogged(t *testing.T) {
 	header["Content-Type"] = []string{"application/json"}
 
 	aw, ms := setup(t)
-	ep := eventprocessorimpl.New(aw, ms)
+	ep, err := eventprocessorimpl.New(aw, ms)
+
+	if err != nil {
+		t.Errorf("creating event processor failed with : %s", err)
+	}
 
 	sendRequest(ep, header, "")
 }
