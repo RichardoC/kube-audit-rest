@@ -71,7 +71,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.13.1
+        uses: aquasecurity/trivy-action@0.14.0
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless"
@@ -84,7 +84,7 @@ jobs:
           sarif_file: 'distroless-results.sarif'
           category: 'trivy-distroless-AMD64'
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.13.1
+        uses: aquasecurity/trivy-action@0.14.0
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine"
