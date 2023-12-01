@@ -1,8 +1,8 @@
 name: Daily vulnerability scan
 
 on:
-  workflow_dispatch: 
-  schedule: 
+  workflow_dispatch:
+  schedule:
   - cron: "52 14 * * *"
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
       packages: read
       # Needed to upload the code scanning results to code-scanning dashboard.
       security-events: write
-    name: Build container images 
+    name: Build container images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
@@ -67,7 +67,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'alpine-results.sarif'
-          category: 'daily-trivy-alpine-AMD64-release'
+          category: 'daily-trivy-alpine-AMD64-on-latest-release'
   static-scan-with-trivy:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
@@ -106,4 +106,3 @@ jobs:
           output: 'dependency-results.sbom.json'
           image-ref: '.'
           github-pat: ${{ secrets.GITHUB_TOKEN }}
-           
