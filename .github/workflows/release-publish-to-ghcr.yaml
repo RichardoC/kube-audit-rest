@@ -101,7 +101,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'alpine-results.sarif'
-          category: 'trivy-alpine-AMD64-release'
+          category: 'trivy-alpine-AMD64-on-release'
   static-scan-with-trivy:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
