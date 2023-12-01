@@ -24,6 +24,12 @@ RUN mkdir /new-tmp
 
 FROM scratch
 
+LABEL org.opencontainers.image.source="https://github.com/RichardoC/kube-audit-rest"
+LABEL org.opencontainers.image.description="Kubernetes audit logging, when you don't control the control plane"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+LABEL org.opencontainers.image.documentation="https://github.com/RichardoC/kube-audit-rest"
+LABEL org.opencontainers.image.title="kube-audit-rest"
+
 # Application port
 EXPOSE 9090
 # Metrics port
