@@ -50,13 +50,17 @@ kube-audit-rest images come in many flavors, each designed for a specific use ca
 
 These are all available for linux/amd64 and linux/arm64 
 
+VERSION refers to github release versions
+
+COMMIT refers to the commits to main
+
 
 ### Available container tags
 
 While the tags below exist, it is recommended to pin to the digest of the container image you wish to use, these can be found on <https://github.com/RichardoC/kube-audit-rest/pkgs/container/kube-audit-rest/>
 
 
-#### <version>-distroless
+#### VERSION-distroless
 
 This is the preferred image for production usage, it only contains the required kube-audit-rest binary, and nothing else.
 
@@ -65,26 +69,26 @@ This means it has the minimum size (~ 14 MB) and number of container layers whic
 Since it doesn't contain an OS, or any other packages this will contain the minimum possible (reported) vulnerabilities.
 
 
-#### <version>-alpine
+#### VERSION-alpine
 
 This is the preferred image for development usage, it contains the required kube-audit-rest binary, and uses a default alpine image containing a shell.
 
 This is larger, but since it contains a shell and other useful utilities it's the best one for experimenting with kube-audit-rest and diagnosing issues.
 
 
-#### <commit>-distroless
+#### COMMIT-distroless
 
-Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `<version>-distroless`
+Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `VERSION-distroless`
 
 
-#### <commit>-alpine
+#### COMMIT-alpine
 
-Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `<version>-alpine`
+Generated container images will be pushed for every commit, so you can experiment with new functionality or bug fixes while waiting for an official release to be genenerated. Otherwise this is the same as `VERSION-alpine`
 
 
 #### latest
 
-This points to the latest `<version>-distroless` image and is only recommended for demo purposes. Use versioned images for stable usage.
+This points to the latest `VERSION-distroless` image and is only recommended for demo purposes. Use versioned images for stable usage.
 
 
 ### Binary options
