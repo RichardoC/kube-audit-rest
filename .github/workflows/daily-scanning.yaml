@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.14.0
+        uses: aquasecurity/trivy-action@0.15.0
         with:
           image-ref: '${{ steps.generate-container-name.outputs.latest_version }}-distroless'
           scan-ref: "daily scan - ${{ steps.generate-container-name.outputs.latest_version }}-distroless"
@@ -56,7 +56,7 @@ jobs:
           sarif_file: 'distroless-results.sarif'
           category: 'daily-trivy-distroless-AMD64-release'
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.14.0
+        uses: aquasecurity/trivy-action@0.15.0
         with:
           image-ref: '${{ steps.generate-container-name.outputs.latest_version }}-alpine'
           scan-ref: "daily scan - ${{ steps.generate-container-name.outputs.latest_version }}-alpine"
