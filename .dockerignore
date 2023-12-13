@@ -16,3 +16,7 @@ tmp/
 
 # Docker
 Dockerfile*
+
+# various documentation
+examples/
+docs/
