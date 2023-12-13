@@ -1,6 +1,6 @@
 # Example - Running kube-audit-rest and ingesting events into elastic search
 
-After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster using vector. You'll also have configuration that drops the data field of secrets so that they aren't logged.
+After following this example, you will have an elastic search cluster running, with all creation/mutation events (except the limitations listed in the readme of this repo) being ingested into that cluster using vector. You'll also have configuration that drops the data field of secrets so that they aren't logged and filter out a variety of low signal to noise objects.
 
 You'll be able to navigate around in kibana and get a feel for the schema used, and what is available form this tool.
 
@@ -122,6 +122,8 @@ If you have any issues, delete the webhook with the following command, and chang
 ```bash
 kubectl create ns test-namespace
 kubectl -n test-namespace create serviceaccount abc
+kubectl -n test-namespace create  secret generic example-secret  --from-literal=VerySecret=topsecret
+kubectl -n test-namespace delete secret example-secret  
 kubectl delete namespace test-namespace
 ```
 
@@ -136,6 +138,8 @@ Timestamp field: timestamp
 ```
 
 Then click "Save data view to Kibana"
+
+You'll be able to see that the API calls regarding the secret were redacted
 
 ## Tidyup
 

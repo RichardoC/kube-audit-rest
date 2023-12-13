@@ -16,12 +16,40 @@ data:
         inputs:
           - audit-files
         type: remap
+        reroute_dropped: true
         source: |-
-          . = parse_json!(.message)
-          .timestamp = .requestReceivedTimestamp
-          if .request.requestKind.kind == Secret {
+          # Ensure that the message is recognised as json
+          # Setting a max_depth because elastic can get very unhappy with how nested k8s objects are
+          . = parse_json!(.message, max_depth: 5)
+          # Remove managedFields as they often cause elastic search ingestion issues
+          del(.request.object.metadata.managedFields)
+          # remove any empty objects as elastic search gets unhappy with them, 
+          # managedFields are a bad example of this
+          . = compact!(., recursive:true, array:true, object:true, null: true)
+          # remove objects where the key is a dot, as elasticsearch refuses to ingest anything containing these
+          # again, managedFields are terrible for this
+          . = remove!(., path: ["."])
+          # set the timestamp in a kibana friendly way from the custom field kube-audit-rest uses
+          ."@timestamp" = .requestReceivedTimestamp
+          # redact the actual value of a secret
+          
+          if .request.requestKind.kind == "Secret" {
             del(.request.object.data)
+            .request.object.data.redacted = "REDACTED"
+            del(.request.oldObject.data)
+            .request.oldObject.data.redacted = "REDACTED"
+
           }
+      filter-spam:
+        inputs:
+          - audit-files-json-parser-and-redaction
+        type: filter
+        condition:
+          type: "vrl"
+          source: |-
+            # It's unlikely that anyone needs to care about leases and they're very very chatty
+            # TokenReviews are only requested by well behaved kubernetes clients, so can be ignored as they're low value to noise
+            .request.kind.group != "coordination.k8s.io" || .request.object.kind != "TokenReview"
     sinks:
       elastic-sink:
         type: elasticsearch
@@ -29,7 +57,7 @@ data:
         bulk: 
           index: example-kube-audit-rest-audit-events
         inputs:
-          - audit-files-json-parser-and-redaction
+          - filter-spam
         endpoints:
         - https://example-kube-audit-rest-es-http.example-kube-audit-rest:9200
         auth:
@@ -40,7 +68,6 @@ data:
           bulk
         tls: # TODO: fix this to actually accept the ES self signed certificates
           verify_certificate: false
-
 ---
 apiVersion: apps/v1
 kind: Deployment
