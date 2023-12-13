@@ -12,13 +12,16 @@ data:
         include:
           - /tmp/*
     transforms:
-      audit-files-json-parser: 
+      audit-files-json-parser-and-redaction: 
         inputs:
           - audit-files
         type: remap
         source: |-
           . = parse_json!(.message)
           .timestamp = .requestReceivedTimestamp
+          if .request.requestKind.kind == Secret {
+            del(.request.object.data)
+          }
     sinks:
       elastic-sink:
         type: elasticsearch
@@ -26,7 +29,7 @@ data:
         bulk: 
           index: example-kube-audit-rest-audit-events
         inputs:
-          - audit-files-json-parser
+          - audit-files-json-parser-and-redaction
         endpoints:
         - https://example-kube-audit-rest-es-http.example-kube-audit-rest:9200
         auth:
