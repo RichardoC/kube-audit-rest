@@ -49,7 +49,7 @@ data:
           source: |-
             # It's unlikely that anyone needs to care about leases and they're very very chatty
             # TokenReviews are only requested by well behaved kubernetes clients, so can be ignored as they're low value to noise
-            .request.kind.group != "coordination.k8s.io" || .request.object.kind != "TokenReview"
+            .request.kind.group != "coordination.k8s.io" && .request.kind.kind != "TokenReview"
     sinks:
       elastic-sink:
         type: elasticsearch
