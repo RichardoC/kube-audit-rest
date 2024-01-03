@@ -77,7 +77,7 @@ jobs:
           provenance: true
           sbom: true
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.16.0
+        uses: aquasecurity/trivy-action@0.16.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
@@ -90,7 +90,7 @@ jobs:
           sarif_file: 'distroless-results.sarif'
           category: 'trivy-distroless-AMD64-release'
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.16.0
+        uses: aquasecurity/trivy-action@0.16.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
