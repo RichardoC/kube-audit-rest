@@ -18,7 +18,7 @@ RUN go vet ./...
 RUN ./testing/locally/local-testing.sh
 
 # CGO_ENABLED forces a static binary
-RUN CGO_ENABLED=0 GOOS=linux GOEXPERIMENT=loopvar go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
 
 RUN mkdir /new-tmp
 
