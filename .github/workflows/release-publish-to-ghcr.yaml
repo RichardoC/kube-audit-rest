@@ -23,7 +23,7 @@ jobs:
           fetch-tags: true
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5.5.0
+        uses: docker/metadata-action@v5.5.1
         with:
           images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
@@ -77,7 +77,7 @@ jobs:
           provenance: true
           sbom: true
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.16.1
+        uses: aquasecurity/trivy-action@0.17.0
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
@@ -85,12 +85,12 @@ jobs:
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy distroless scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3.23.2
+        uses: github/codeql-action/upload-sarif@v3.24.0
         with:
           sarif_file: 'distroless-results.sarif'
           category: 'trivy-distroless-AMD64-release'
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.16.1
+        uses: aquasecurity/trivy-action@0.17.0
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
@@ -98,7 +98,7 @@ jobs:
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy alpine scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3.23.2
+        uses: github/codeql-action/upload-sarif@v3.24.0
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'trivy-alpine-AMD64-on-release'
@@ -129,7 +129,7 @@ jobs:
           output: 'repo-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy repo scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3.23.2
+        uses: github/codeql-action/upload-sarif@v3.24.0
         with:
           sarif_file: 'repo-results.sarif'
           category: 'trivy-repo-release'
