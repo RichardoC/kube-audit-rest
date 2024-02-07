@@ -19,7 +19,7 @@ type logRequestListener struct {
 
 func New(port int, certFilename string, certKeyFilename string, eProc eventprocessor.EventProcessor) httplistener.HttpListener {
 	router := http.NewServeMux()
-	router.HandleFunc("/log-request", eProc.ProcessEvent)
+	router.HandleFunc("POST /log-request", eProc.ProcessEvent)
 
 	addr := fmt.Sprintf(":%d", port)
 	server := &http.Server{
