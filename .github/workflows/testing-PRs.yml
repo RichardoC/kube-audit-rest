@@ -19,7 +19,7 @@ jobs:
       - name: Setup Action
         uses: actions/checkout@v4.1.1
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.1.0
+        uses: docker/setup-buildx-action@v3.2.0
       - name: Build alpine based image
         uses: docker/build-push-action@v5.2.0
         with:
@@ -54,7 +54,7 @@ jobs:
         with:
           platforms: 'arm64'
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.1.0
+        uses: docker/setup-buildx-action@v3.2.0
       - name: Build alpine based image
         uses: docker/build-push-action@v5.2.0
         with:
@@ -117,7 +117,7 @@ jobs:
       - name: Setup Action
         uses: actions/checkout@v4.1.1
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.1.0
+        uses: docker/setup-buildx-action@v3.2.0
       - name: Run semgrep
         # excluding yamls due to false positives with the elasticsearch example for now
         run: docker run --rm -v "${PWD}:/src" returntocorp/semgrep:1.48.0-nonroot@sha256:572b06425becea5b9b26bcd01f78553383ab052debfeb2c57720cebd6999d964 semgrep ci --config auto  --exclude=*.yaml
