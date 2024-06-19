@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push alpine based image
-        uses: docker/build-push-action@v5.4.0
+        uses: docker/build-push-action@v6.0.1
         with:
           file: Dockerfile-alpine
           context: .
@@ -64,7 +64,7 @@ jobs:
           provenance: true
           sbom: true
       - name: Build and push distroless image
-        uses: docker/build-push-action@v5.4.0
+        uses: docker/build-push-action@v6.0.1
         with:
           file: Dockerfile-distroless
           context: .
