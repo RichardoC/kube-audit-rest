@@ -22,7 +22,7 @@ RUN ./testing/locally/local-testing.sh
 RUN CGO_ENABLED=0 GOOS=linux go build -o kube-audit-rest ./cmd/kube-audit-rest/main.go
 
 
-FROM alpine:3.20.0@sha256:77726ef6b57ddf65bb551896826ec38bc3e53f75cdde31354fbffb4f25238ebd
+FROM alpine:3.20.1@sha256:b89d9c93e9ed3597455c90a0b88a8bbb5cb7188438f70953fede212a0c4394e0
 
 LABEL org.opencontainers.image.source="https://github.com/RichardoC/kube-audit-rest"
 LABEL org.opencontainers.image.description="Kubernetes audit logging, when you don't control the control plane"
