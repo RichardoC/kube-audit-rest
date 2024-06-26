@@ -20,7 +20,9 @@ data:
         source: |-
           # Ensure that the message is recognised as json
           # Setting a max_depth because elastic can get very unhappy with how nested k8s objects are
-          . = parse_json!(.message, max_depth: 5)
+          # The depth is low because elastic requires all messages to have the same fields, and deeply
+          # nested objects like pods don't match the schema of things like configmaps
+          . = parse_json!(.message, max_depth: 2)
           # Remove managedFields as they often cause elastic search ingestion issues
           del(.request.object.metadata.managedFields)
           # remove any empty objects as elastic search gets unhappy with them, 
