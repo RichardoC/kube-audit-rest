@@ -141,6 +141,21 @@ Then click "Save data view to Kibana"
 
 You'll be able to see that the API calls regarding the secret were redacted
 
+## Install in another namespace
+If you would like to deploy to another namespace, recursively replace all occurences of `example-kube-audit-rest`
+with your desired namespace name. Then just follow the guide from the local README.md - the commands will have
+been adjusted. If you don't feel secure about just replacing everything, go through the matches
+manually. On your own risk :)
+
+## Attach to an already deployed Elasticsearch-instance.
+After testing it in a separate namespace, you can also use this example to connect kube-audit-rest with an existing
+Elasticsearch instance. Adjust the namespace as indicated above, then recursively replace `elasticsearch-kube-audit-rest` 
+the name of your Elasticsearch instance. If you don't feel secure about just replacing everything, go through the matches
+manually.
+
+Then follow this guide, but skip deploying the Elastic CRD's, Operator and 
+`examples/full-elastic-stack/k8s/elastic-cluster.yaml` as you already have them. On your own risk :)
+
 ## Tidyup
 
 WARNING this *will* delete the elastic operator, if it's already running in this cluster
