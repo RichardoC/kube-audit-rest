@@ -4,6 +4,8 @@ Want to get a kubernetes audit log without having the ability to configure the k
 Use kube-audit-rest to capture all mutation/creation API calls to disk, before exporting those to your logging infrastructure.
 This should be much cheaper than the Cloud Service Provider managed offerings which charges ~ per API call and don't support ingestion filtering.
 
+If you do control the kube-api-server then use the [built in audit logging](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/), not kube-audit-rest
+
 This tool is maintained and originally created by [Richard Tweed](https://github.com/RichardoC)
 
 
