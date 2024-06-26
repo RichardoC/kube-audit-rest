@@ -127,6 +127,13 @@ spec:
             - ALL 
       - name: vector
         image: docker.io/timberio/vector:0.33.0-distroless-static@sha256:90e14483720ea7dfa5c39812a30f37d3bf3a94b6611787a0d14055b8ac31eb1f
+        resources:
+          requests:
+            cpu:  "2m"
+            memory: "10Mi"
+          limits:
+            cpu: "2"
+            memory: "512Mi"
         env:
         - name: ESP
           valueFrom:
