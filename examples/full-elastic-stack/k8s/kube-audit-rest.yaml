@@ -57,11 +57,11 @@ data:
         type: elasticsearch
         api_version: v8
         bulk: 
-          index: example-kube-audit-rest-audit-events
+          index: kube-audit-rest-example-audit-events
         inputs:
           - filter-spam
         endpoints:
-        - https://example-kube-audit-rest-es-http.example-kube-audit-rest:9200
+        - https://elasticsearch-kube-audit-rest-es-http.example-kube-audit-rest:9200
         auth:
           strategy: basic
           user: elastic
@@ -138,7 +138,7 @@ spec:
         - name: ESP
           valueFrom:
             secretKeyRef:
-              name: example-kube-audit-rest-es-elastic-user
+              name: elasticsearch-kube-audit-rest-es-elastic-user
               key: elastic
         volumeMounts:
         - name: tmp

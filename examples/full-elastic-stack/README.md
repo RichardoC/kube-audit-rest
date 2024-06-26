@@ -54,7 +54,7 @@ Then check that the elastic cluster, and kibana is running in example-kube-audit
 ```bash
 kubectl -n example-kube-audit-rest get po
 NAME                                         READY   STATUS    RESTARTS   AGE
-example-kube-audit-rest-es-default-0         1/1     Running   0          23m
+elasticsearch-kube-audit-rest-es-default-0         1/1     Running   0          23m
 kibana-kube-audit-rest-kb-868975c597-4r9nj   1/1     Running   0          23m
 ```
 
@@ -71,7 +71,7 @@ Use another terminal to get the password to access
 
 ```bash
 echo "username is elastic"
-echo "password is $(kubectl -n example-kube-audit-rest get secret example-kube-audit-rest-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo)"
+echo "password is $(kubectl -n example-kube-audit-rest get secret elasticsearch-kube-audit-rest-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo)"
 ```
 
 ## Set up kube-audit-rest

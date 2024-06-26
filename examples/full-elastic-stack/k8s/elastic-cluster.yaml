@@ -7,7 +7,7 @@ metadata:
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
-  name: example-kube-audit-rest
+  name: elasticsearch-kube-audit-rest
   namespace: example-kube-audit-rest
 spec:
   version: 8.10.4
@@ -26,7 +26,7 @@ spec:
   version: 8.10.4
   count: 1
   elasticsearchRef:
-    name: example-kube-audit-rest
+    name: elasticsearch-kube-audit-rest
   config: 
     telemetry:
       optIn: false
