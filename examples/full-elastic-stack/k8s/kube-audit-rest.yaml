@@ -40,7 +40,6 @@ data:
             .request.object.data.redacted = "REDACTED"
             del(.request.oldObject.data)
             .request.oldObject.data.redacted = "REDACTED"
-
           }
       filter-spam:
         inputs:
@@ -52,14 +51,29 @@ data:
             # It's unlikely that anyone needs to care about leases and they're very very chatty
             # TokenReviews are only requested by well behaved kubernetes clients, so can be ignored as they're low value to noise
             .request.kind.group != "coordination.k8s.io" && .request.kind.kind != "TokenReview"
+      add_fields: # add data_stream fields
+        type: remap
+        inputs: [filter-spam]
+        source: |-
+          .data_stream.namespace = "all"
+          .data_stream.dataset = "kubernetes-kube-audit-rest-example"
+          .data_stream.type = "logs"
     sinks:
       elastic-sink:
+        inputs:
+          - add_fields
         type: elasticsearch
         api_version: v8
-        bulk: 
-          index: kube-audit-rest-example-audit-events
-        inputs:
-          - filter-spam
+        data_stream:
+          namespace: all
+          dataset: kubernetes-kube-audit-rest-example
+          type: logs
+        bulk:
+          action: "create" # required for data_stream to work
+          # the index name must be <data_stream.namespace>-<data_stream.dataset>-<data_stream.type>
+          # make sure the data_stream fields are set accordingly in the add_fields transform and the
+          # data_stream section of the sink. If they don't align, Elasticsearch does not accept the data
+          index: "logs-kubernetes-kube-audit-rest-example-all"
         endpoints:
         - https://elasticsearch-kube-audit-rest-es-http.example-kube-audit-rest:9200
         auth:
