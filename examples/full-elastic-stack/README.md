@@ -54,7 +54,7 @@ Then check that the elastic cluster, and kibana is running in example-kube-audit
 ```bash
 kubectl -n example-kube-audit-rest get po
 NAME                                         READY   STATUS    RESTARTS   AGE
-example-kube-audit-rest-es-default-0         1/1     Running   0          23m
+elasticsearch-kube-audit-rest-es-default-0         1/1     Running   0          23m
 kibana-kube-audit-rest-kb-868975c597-4r9nj   1/1     Running   0          23m
 ```
 
@@ -71,7 +71,7 @@ Use another terminal to get the password to access
 
 ```bash
 echo "username is elastic"
-echo "password is $(kubectl -n example-kube-audit-rest get secret example-kube-audit-rest-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo)"
+echo "password is $(kubectl -n example-kube-audit-rest get secret elasticsearch-kube-audit-rest-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo)"
 ```
 
 ## Set up kube-audit-rest
@@ -140,6 +140,21 @@ Timestamp field: timestamp
 Then click "Save data view to Kibana"
 
 You'll be able to see that the API calls regarding the secret were redacted
+
+## Install in another namespace
+If you would like to deploy to another namespace, recursively replace all occurences of `example-kube-audit-rest`
+with your desired namespace name. Then just follow the guide from the local README.md - the commands will have
+been adjusted. If you don't feel secure about just replacing everything, go through the matches
+manually. Use at your own risk!
+
+## Attach to an already deployed Elasticsearch-instance.
+After testing it in a separate namespace, you can also use this example to connect kube-audit-rest with an existing
+Elasticsearch instance. Adjust the namespace as indicated above, then recursively replace `elasticsearch-kube-audit-rest` 
+the name of your Elasticsearch instance. If you don't feel secure about just replacing everything, go through the matches
+manually.
+
+Then follow this guide, but skip deploying the Elastic CRD's, Operator and 
+`examples/full-elastic-stack/k8s/elastic-cluster.yaml` as you already have them. On your own risk :)
 
 ## Tidyup
 
