@@ -145,7 +145,7 @@ You'll be able to see that the API calls regarding the secret were redacted
 If you would like to deploy to another namespace, recursively replace all occurences of `example-kube-audit-rest`
 with your desired namespace name. Then just follow the guide from the local README.md - the commands will have
 been adjusted. If you don't feel secure about just replacing everything, go through the matches
-manually. On your own risk :)
+manually. Use at your own risk!
 
 ## Attach to an already deployed Elasticsearch-instance.
 After testing it in a separate namespace, you can also use this example to connect kube-audit-rest with an existing
