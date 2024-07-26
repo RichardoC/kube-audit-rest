@@ -251,9 +251,6 @@ Due to how dynamic admisson control works on managed Kubernetes clusters, kube-a
 
 kube-audit-rest will not be able to write audit logs if the host disks are full.
 
-
-
-
 ### Certificate expires/invalid
 
 The application logs will be full of the following error, and you will *not* get any more audit logs until this is fixed.
