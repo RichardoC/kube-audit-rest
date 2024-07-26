@@ -247,6 +247,12 @@ API calls can be logged repeatedly due to Kubernetes repeatedly re-calling the [
 
 WARNING: This can only log mutation/creation requests. Read Only requests are *not* sent to mutating or validating webhooks unfortunately.
 
+Due to how dynamic admisson control works on managed Kubernetes clusters, kube-audit-rest is unable to verfiy that the requests are coming from the control plane, so there is the risk that an attacker could flood the logs with nonsense. This could be rectified by registering kube-audit-rest as a custom API (with https://github.com/kubernetes-sigs/apiserver-runtime https://kubernetes.io/docs/concepts/extend-kubernetes/) and using that custom API as the webhook, as the api server uses MTLS to authenticate but this risks causing denial of service if the kube-audit-rest server is down, so won't be done for now.
+
+kube-audit-rest will not be able to write audit logs if the host disks are full.
+
+
+
 
 ### Certificate expires/invalid
 
