@@ -5,5 +5,7 @@
     "docker:enableMajor"
   ],
   "automergeType": "pr",
+  "separateMinorPatch": true,
+  "automerge": true,
   "prCreation": "immediate"
 }
