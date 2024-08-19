@@ -54,6 +54,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push alpine based image
+        id: alpine-image
         uses: docker/build-push-action@v6.7.0
         with:
           file: Dockerfile-alpine
@@ -68,13 +69,14 @@ jobs:
           provenance: true
           sbom: true
       - name: Attest alpine based image
-        uses: actions/attest-build-provenance@v1
         id: attest-alpine
+        uses: actions/attest-build-provenance@v1
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
-          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-digest: ${{ steps.alpine-image.outputs.digest }}
           push-to-registry: true
       - name: Build and push distroless image
+        id: distroless-image
         uses: docker/build-push-action@v6.7.0
         with:
           file: Dockerfile-distroless
@@ -89,11 +91,11 @@ jobs:
           provenance: true
           sbom: true
       - name: Attest distroless based image
-        uses: actions/attest-build-provenance@v1
         id: attest-distroless
+        uses: actions/attest-build-provenance@v1
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
-          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-digest: ${{ steps.distroless-image.outputs.digest }}
           push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless AMD64 container
         uses: aquasecurity/trivy-action@0.24.0
