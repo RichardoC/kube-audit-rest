@@ -14,6 +14,10 @@ jobs:
       packages: write
       # Needed to upload the code scanning results to code-scanning dashboard.
       security-events: write
+      # For uploading attestations
+      attestations: write 
+      # For OICD?  https://github.com/actions/deploy-pages/issues/329
+      id-token: write
 
     name: Build and publish AMD64 and ARM64 container images 📦 to GitHub Container Registry
     runs-on: ubuntu-latest
@@ -63,6 +67,13 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
+      - name: Attest alpine based image
+        uses: actions/attest-build-provenance@v1
+        id: attest-alpine
+        with:
+          subject-name: ghcr.io/richardoc/kube-audit-rest
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
       - name: Build and push distroless image
         uses: docker/build-push-action@v6.7.0
         with:
@@ -77,6 +88,13 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
+      - name: Attest distroless based image
+        uses: actions/attest-build-provenance@v1
+        id: attest-distroless
+        with:
+          subject-name: ghcr.io/richardoc/kube-audit-rest
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless AMD64 container
         uses: aquasecurity/trivy-action@0.24.0
         with:
