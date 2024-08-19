@@ -71,7 +71,7 @@ jobs:
         uses: actions/attest-build-provenance@v1
         id: attest-alpine
         with:
-          subject-name: ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine
+          subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
       - name: Build and push distroless image
@@ -92,7 +92,7 @@ jobs:
         uses: actions/attest-build-provenance@v1
         id: attest-distroless
         with:
-          subject-name: ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine
+          subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless AMD64 container
