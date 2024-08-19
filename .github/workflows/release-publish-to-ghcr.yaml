@@ -29,7 +29,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
         with:
-          platforms: 'arm64'
+          platforms: "arm64"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -48,6 +48,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push alpine based image
+        id: alpine-image
         uses: docker/build-push-action@v6.7.0
         with:
           file: Dockerfile-alpine
@@ -61,7 +62,15 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
+      - name: Attest alpine based image
+        id: attest-alpine
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/richardoc/kube-audit-rest
+          subject-digest: ${{ steps.alpine-image.outputs.digest }}
+          push-to-registry: true
       - name: Build and push distroless image
+        id: distroless-image
         uses: docker/build-push-action@v6
         with:
           file: Dockerfile-distroless
@@ -76,32 +85,39 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: true
           sbom: true
+      - name: Attest distroless based image
+        id: attest-distroless
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/richardoc/kube-audit-rest
+          subject-digest: ${{ steps.distroless-image.outputs.digest }}
+          push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless container
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless'
+          image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
-          format: 'sarif'
-          output: 'distroless-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+          format: "sarif"
+          output: "distroless-results.sarif"
+          github-pat: "${{ secrets.GITHUB_TOKEN }}"
       - name: Upload Trivy distroless scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3.26.3
         with:
-          sarif_file: 'distroless-results.sarif'
-          category: 'trivy-distroless-AMD64-release'
+          sarif_file: "distroless-results.sarif"
+          category: "trivy-distroless-AMD64-release"
       - name: Run Trivy vulnerability scanner for alpine container
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine'
+          image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
-          format: 'sarif'
-          output: 'alpine-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+          format: "sarif"
+          output: "alpine-results.sarif"
+          github-pat: "${{ secrets.GITHUB_TOKEN }}"
       - name: Upload Trivy alpine scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3.26.3
         with:
-          sarif_file: 'alpine-results.sarif'
-          category: 'trivy-alpine-AMD64-on-release'
+          sarif_file: "alpine-results.sarif"
+          category: "trivy-alpine-AMD64-on-release"
   static-scan-with-trivy:
     # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
     permissions:
@@ -119,26 +135,26 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v4.1.7
         with:
-             fetch-depth: 0
+          fetch-depth: 0
       - name: Run Trivy vulnerability scanner in fs mode
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'repo-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "repo-results.sarif"
+          github-pat: "${{ secrets.GITHUB_TOKEN }}"
       - name: Upload Trivy repo scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3.26.3
         with:
-          sarif_file: 'repo-results.sarif'
-          category: 'trivy-repo-release'
+          sarif_file: "repo-results.sarif"
+          category: "trivy-repo-release"
 
       - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          format: 'github'
-          output: 'dependency-results.sbom.json'
-          image-ref: '.'
+          scan-type: "fs"
+          format: "github"
+          output: "dependency-results.sbom.json"
+          image-ref: "."
           github-pat: ${{ secrets.GITHUB_TOKEN }}
