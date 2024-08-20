@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/golang/mock v1.6.0
-	github.com/prometheus/client_golang v1.20.0
+	github.com/prometheus/client_golang v1.20.1
 	github.com/stretchr/testify v1.9.0
 	github.com/thought-machine/go-flags v1.6.3
 	github.com/tidwall/gjson v1.17.3
