@@ -13,6 +13,10 @@ jobs:
       packages: write
       # Needed to upload the code scanning results to code-scanning dashboard.
       security-events: write
+     # For uploading attestations
+      attestations: write 
+      # For OICD?  https://github.com/actions/deploy-pages/issues/329
+      id-token: write
     name: Build and publish container images 📦 to GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
