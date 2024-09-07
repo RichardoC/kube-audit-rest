@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine3.19@sha256:90a66221a80ac09c0b48d2b2cdc6b03320ccf665dd1e8939d2a839a9220c4f9e AS builder
+FROM golang:1.23.1-alpine3.19@sha256:5aca55f186227f4792484cc22a1d94a455eb4a85f9a54c41742b039d5cc7022a AS builder
 
 # Can be removed once testing done from go rather than bash
 # gcc and libc-dev needed for go vet
