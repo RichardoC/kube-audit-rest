@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
         with:
              fetch-depth: 0
       - name: Detect latest release
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
         with:
              fetch-depth: 0
       - name: Run Trivy vulnerability scanner in fs mode
