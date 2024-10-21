@@ -3,7 +3,7 @@ name: Daily vulnerability scan
 on:
   workflow_dispatch:
   schedule:
-  - cron: "52 14 * * *"
+  - cron: "43 14 * * *"
 
 jobs:
   build-and-publish-result-to-ghcr:
