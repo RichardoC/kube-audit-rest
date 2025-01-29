@@ -1,4 +1,3 @@
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -36,11 +35,15 @@ data:
           # redact the actual value of a secret
           
           if .request.requestKind.kind == "Secret" {
+            # Redact the secret data
             del(.request.object.data)
             .request.object.data.redacted = "REDACTED"
             del(.request.oldObject.data)
             .request.oldObject.data.redacted = "REDACTED"
 
+            # Remove the previously set secret data - Not bothering to parse it as this annotation shouldn't ever be needed
+            del(.request.object.metadata.annotations.["kubectl.kubernetes.io/last-applied-configuration"])
+            del(.request.oldObject.metadata.annotations.["kubectl.kubernetes.io/last-applied-configuration"])
           }
       filter-spam:
         inputs:
@@ -96,69 +99,69 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - image: ghcr.io/richardoc/kube-audit-rest:ad68f71978e8cd610b5b06769fab301cf9ee74d0-distroless@sha256:2444c1207156681c4ed04e7bb02662820c9bfb31b50e8fe5b0112b3f8f577d42
-        imagePullPolicy: IfNotPresent
-        name: kube-audit-rest
-        resources:
-          requests:
-            cpu:  "2m"
-            memory: "10Mi"
-          limits:
-            cpu: "1"
-            memory: "32Mi"
-        ports:
-        - containerPort: 9090
-          protocol: TCP
-          name: https
-        - containerPort: 55555
-          protocol: TCP
-          name: metrics
-        volumeMounts:
-        - name: certs
-          mountPath: "/etc/tls"
-          readOnly: true
-        - name: tmp
-          mountPath: "/tmp"
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop: 
-            - ALL 
-      - name: vector
-        image: docker.io/timberio/vector:0.33.0-distroless-static@sha256:90e14483720ea7dfa5c39812a30f37d3bf3a94b6611787a0d14055b8ac31eb1f
-        resources:
-          requests:
-            cpu:  "2m"
-            memory: "10Mi"
-          limits:
-            cpu: "2"
-            memory: "512Mi"
-        env:
-        - name: ESP
-          valueFrom:
-            secretKeyRef:
-              name: elasticsearch-kube-audit-rest-es-elastic-user
-              key: elastic
-        volumeMounts:
-        - name: tmp
-          mountPath: "/tmp"
-          readOnly: true
-        - name: vector-config
-          mountPath: "/etc/vector/"
-          readOnly: true
+        - image: ghcr.io/richardoc/kube-audit-rest:ad68f71978e8cd610b5b06769fab301cf9ee74d0-distroless@sha256:2444c1207156681c4ed04e7bb02662820c9bfb31b50e8fe5b0112b3f8f577d42
+          imagePullPolicy: IfNotPresent
+          name: kube-audit-rest
+          resources:
+            requests:
+              cpu: "2m"
+              memory: "10Mi"
+            limits:
+              cpu: "1"
+              memory: "32Mi"
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+              name: https
+            - containerPort: 55555
+              protocol: TCP
+              name: metrics
+          volumeMounts:
+            - name: certs
+              mountPath: "/etc/tls"
+              readOnly: true
+            - name: tmp
+              mountPath: "/tmp"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+        - name: vector
+          image: docker.io/timberio/vector:0.33.0-distroless-static@sha256:90e14483720ea7dfa5c39812a30f37d3bf3a94b6611787a0d14055b8ac31eb1f
+          resources:
+            requests:
+              cpu: "2m"
+              memory: "10Mi"
+            limits:
+              cpu: "2"
+              memory: "512Mi"
+          env:
+            - name: ESP
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-kube-audit-rest-es-elastic-user
+                  key: elastic
+          volumeMounts:
+            - name: tmp
+              mountPath: "/tmp"
+              readOnly: true
+            - name: vector-config
+              mountPath: "/etc/vector/"
+              readOnly: true
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
-      - name: certs
-        secret:
-          secretName: kube-audit-rest
-      - name: tmp
-        emptyDir:
-          sizeLimit: 2Gi # Based on default of 3 files at 500Mi
-      - name: vector-config
-        configMap:
-          name: vector-config
+        - name: certs
+          secret:
+            secretName: kube-audit-rest
+        - name: tmp
+          emptyDir:
+            sizeLimit: 2Gi # Based on default of 3 files at 500Mi
+        - name: vector-config
+          configMap:
+            name: vector-config
 ---
 apiVersion: v1
 kind: Service
@@ -168,14 +171,14 @@ metadata:
   name: kube-audit-rest
 spec:
   ports:
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: https
-  - name: metrics
-    port: 55555
-    protocol: TCP
-    targetPort: metrics
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+    - name: metrics
+      port: 55555
+      protocol: TCP
+      targetPort: metrics
   selector:
     app: kube-audit-rest
   sessionAffinity: None
