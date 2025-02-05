@@ -42,8 +42,8 @@ data:
             .request.oldObject.data.redacted = "REDACTED"
 
             # Remove the previously set secret data - Not bothering to parse it as this annotation shouldn't ever be needed
-            del(.request.object.metadata.annotations.["kubectl.kubernetes.io/last-applied-configuration"])
-            del(.request.oldObject.metadata.annotations.["kubectl.kubernetes.io/last-applied-configuration"])
+            del(.request.object.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration")
+            del(.request.oldObject.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration")
           }
       filter-spam:
         inputs:
