@@ -97,7 +97,7 @@ jobs:
           subject-digest: ${{ steps.distroless-image.outputs.digest }}
           push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
@@ -110,7 +110,7 @@ jobs:
           sarif_file: "distroless-results.sarif"
           category: "trivy-distroless-AMD64-release"
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
