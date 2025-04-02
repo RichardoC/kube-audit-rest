@@ -71,7 +71,7 @@ jobs:
           tags: |
             ghcr.io/richardoc/kube-audit-rest:test-distroless
             ghcr.io/richardoc/kube-audit-rest:latest
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
   execute-unittests:
