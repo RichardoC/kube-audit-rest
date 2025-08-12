@@ -2,7 +2,7 @@ module github.com/RichardoC/kube-audit-rest
 
 go 1.23.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/golang/mock v1.6.0
