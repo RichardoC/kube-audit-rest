@@ -14,7 +14,19 @@ type stderrWritter struct {
 }
 
 func New() auditwritter.AuditWritter {
-	lg, err := zap.NewProduction()
+	zapConfig := zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		Development: false,
+		Sampling: &zap.SamplingConfig{
+			Initial:    100,
+			Thereafter: 100,
+		},
+		Encoding:         "console",
+		EncoderConfig:    zap.NewProductionEncoderConfig(),
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+	lg, err := zapConfig.Build()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
 	}
