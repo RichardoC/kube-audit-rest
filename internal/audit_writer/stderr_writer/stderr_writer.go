@@ -13,8 +13,10 @@ type stderrWritter struct {
 	writer *zapio.Writer
 }
 
-func New() auditwritter.AuditWritter {
-	lg, err := zap.NewProduction()
+func New(loggingFormat string) auditwritter.AuditWritter {
+	zapConfig := zap.NewProductionConfig()
+	zapConfig.Encoding = loggingFormat
+	lg, err := zapConfig.Build()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
 	}
