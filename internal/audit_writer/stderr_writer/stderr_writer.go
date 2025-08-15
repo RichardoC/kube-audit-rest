@@ -6,6 +6,7 @@ import (
 	auditwritter "github.com/RichardoC/kube-audit-rest/internal/audit_writer"
 	commonwriter "github.com/RichardoC/kube-audit-rest/internal/audit_writer/common_writer"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zapio"
 )
 
@@ -16,6 +17,7 @@ type stderrWritter struct {
 func New() auditwritter.AuditWritter {
 	zapConfig := zap.NewProductionConfig()
 	zapConfig.Encoding = "console"
+	zapConfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	lg, err := zapConfig.Build()
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
