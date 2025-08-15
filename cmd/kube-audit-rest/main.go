@@ -41,7 +41,7 @@ type Options struct {
 	ServerPort       int    `long:"server-port" description:"Port to run https server on" default:"9090"`
 	MetricsPort      int    `long:"metrics-port" description:"Port to run http metrics server on" default:"55555"`
 	Verbose          bool   `long:"verbosity" short:"v" description:"Uses zap Development default verbose mode rather than production"`
-	LoggingFormat    string `long:"logging-format" description:"Output format for stderr/stdout. Only works when audit-to-std-log is used. One of: (json, console)" default:"json"`
+	LoggingFormat    string `long:"logging-format" description:"Output format for stderr/stdout when --audit-to-std-log is used. One of: (json, console)" default:"json"`
 }
 
 func main() {
