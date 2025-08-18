@@ -15,8 +15,8 @@ mkdir -p tmp
 # Create required certs
 testing/certs.sh
 
-nerdctl build -f Dockerfile-distroless . --namespace k8s.io -t "ghcr.io/richardoc/kube-audit-rest:${COMMIT}-distroless"
-# nerdctl build -f Dockerfile-alpine . --namespace k8s.io -t "richardoc/kube-audit-rest:${COMMIT}-alpine"
+docker build -f Dockerfile-distroless . -t "ghcr.io/richardoc/kube-audit-rest:${COMMIT}-distroless"
+# docker build -f Dockerfile-alpine . -t "richardoc/kube-audit-rest:${COMMIT}-alpine"
 
 kubectl -n kube-audit-rest apply -f k8s/namespace.yaml
 
