@@ -12,4 +12,4 @@ kubectl -n hacker create secret generic hacking-creds --from-literal="DB_PASSWOR
 
 kubectl -n hacker run monero-miner --force=true --image alpine -- tail -f /dev/null
 
-kubectl -n kube-audit-rest logs kube-audit-rest-5c6bc76b4c-7kd82 | grep zapio| grep hacker | jq '.msg | fromjson '
+kubectl -n kube-audit-rest logs deployment/kube-audit-rest | grep zapio| grep hacker | jq '.msg | fromjson '
