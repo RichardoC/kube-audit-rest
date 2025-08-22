@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kube-audit-rest.fullname" . }}
+  labels:
+    {{- include "kube-audit-rest.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: https
+      protocol: TCP
+      name: https
+    - port: 55555 # TODO
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "kube-audit-rest.selectorLabels" . | nindent 4 }}

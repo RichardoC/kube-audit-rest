@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kube-audit-rest.fullname" . }}
+  labels:
+    {{- include "kube-audit-rest.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kube-audit-rest.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        config-hash: {{ include "kube-audit-rest.configHash" . }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kube-audit-rest.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kube-audit-rest.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: kube-audit-rest
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ include "kube-audit-rest.imageTag" . }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+              name: https
+            - containerPort: 55555
+              protocol: TCP
+              name: metrics
+          {{- with .Values.options }}
+          command:
+            - "/kube-audit-rest"
+            {{- range $key, $val := . }}
+            - "--{{ $key }}={{ $val }}"
+            {{- end }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: logs
+              mountPath: "/tmp"
+            - mountPath: /etc/tls
+              name: cert
+              readOnly: true
+        - name: fluent-bit
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.fluentBit.image.repository }}:{{ .Values.fluentBit.image.tag }}"
+          imagePullPolicy: {{ .Values.fluentBit.image.pullPolicy }}
+          args: ["-c", "/cfg/fluent-bit.yaml"]
+          {{- with .Values.fluentBit.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: logs
+              mountPath: "/tmp"
+            - name: config
+              mountPath: "/cfg"
+              readOnly: true
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 422
+            secretName: {{ include "kube-audit-rest.fullname" . }}-cert
+        - name: logs
+          {{- toYaml .Values.logsVolume | nindent 10 }}
+        - name: config
+          secret:
+            secretName: {{ include "kube-audit-rest.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

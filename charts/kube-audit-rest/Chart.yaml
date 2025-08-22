@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kube-audit-rest
+description: Helm chart for kube-audit-rest
+type: application
+version: 0.1.0
+appVersion: "1.0.22"

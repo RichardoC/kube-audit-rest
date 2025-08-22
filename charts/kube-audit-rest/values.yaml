@@ -1,0 +1,191 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/richardoc/kube-audit-rest
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is based on the chart appVersion
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: false
+  annotations: {}
+  name: ""
+
+# kube-audit-rest command line options without '--' prefix
+options:
+  logger-max-size: 100
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 443
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: metrics
+
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: metrics
+
+logsVolume:
+  emptyDir:
+    sizeLimit: 1Gi
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+fluentBit:
+  image:
+    repository: cr.fluentbit.io/fluent/fluent-bit
+    pullPolicy: IfNotPresent
+    tag: 4.0.8
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # fluent-bit configuration in a new YAML format
+  config:
+    parsers:
+      - name: admissionReview
+        format: json
+        time_key: requestReceivedTimestamp
+        time_format: "%Y-%m-%dT%H:%M:%S.%L"
+        time_keep: false
+    pipeline:
+      inputs:
+        - name: tail
+          path: /tmp/*.log
+          parser: admissionReview
+          refresh_interval: 30
+          buffer_max_size: 2M
+          skip_long_lines: "on"
+      filters:
+        - name: lua
+          match: '*'
+          script: /cfg/fluent-bit.lua
+          call: filter_message
+      outputs:
+        - name: stdout
+          match: '*'
+
+  # Lua code used to filter messages
+  configLua: |
+    -- Keys which might contain sensitive content
+    local function is_sensitive_key(key)
+        local lower_key = string.lower(tostring(key))
+
+        return string.find(lower_key, "password") or
+               string.find(lower_key, "passwd") or
+               string.find(lower_key, "pswd") or
+               string.find(lower_key, "secret") or
+               string.find(lower_key, "private") or
+               string.find(lower_key, "security_key") or
+               string.find(lower_key, "securitykey") or
+               string.find(lower_key, "private_key") or
+               string.find(lower_key, "privatekey") or
+               string.find(lower_key, "api_key") or
+               string.find(lower_key, "apikey") or
+               lower_key == "kubectl.kubernetes.io/last-applied-configuration"
+    end
+
+    -- Recursively walk through data structure and remove
+    -- values for potentially sensitive keys
+    local function redact_structure(data)
+        for k, v in pairs(data) do
+            if is_sensitive_key(k) then
+                data[k] = "***"
+            elseif type(v) == "table" then
+                data[k] = redact_structure(data[k])
+            end
+        end
+
+        return data
+    end
+
+    function filter_message(tag, timestamp, record)
+        if not record["request"] then
+            return 0, timestamp, record
+        end
+
+        -- drop some noisy messages
+        if record["request"]["kind"] and
+           (record["request"]["kind"]["group"] == "coordination.k8s.io" or
+            record["request"]["kind"]["kind"]  == "TokenReview")
+        then
+            return -1, timestamp, record
+        end
+
+        if record["request"]["object"] then
+            -- don't log any Secret data
+            if record["request"]["requestKind"] and record["request"]["requestKind"]["kind"] == "Secret" then
+                record["request"]["object"]["data"] = "***"
+            end
+
+            if record["request"]["object"]["metadata"] then
+                record["request"]["object"]["metadata"]["managedFields"] = nil
+            end
+        end
+
+        if record["request"]["oldObject"] then
+            -- don't log any Secret data
+            if record["request"]["requestKind"] and record["request"]["requestKind"]["kind"] == "Secret" then
+                record["request"]["oldObject"]["data"] = "***"
+            end
+
+            if record["request"]["oldObject"]["metadata"] then
+                record["request"]["oldObject"]["metadata"]["managedFields"] = nil
+            end
+        end
+
+        record = redact_structure(record)
+
+        return 1, timestamp, record
+    end

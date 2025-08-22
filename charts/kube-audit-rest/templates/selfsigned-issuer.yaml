@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "kube-audit-rest.fullname" . }}-selfsigned-issuer
+  labels:
+    {{- include "kube-audit-rest.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
