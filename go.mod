@@ -7,7 +7,7 @@ toolchain go1.25.0
 require (
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.23.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/thought-machine/go-flags v1.7.0
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5
