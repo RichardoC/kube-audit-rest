@@ -1,0 +1,26 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "kube-audit-rest.fullname" . }}
+  annotations:
+    cert-manager.io/inject-ca-from: "{{ .Release.Namespace }}/{{ include "kube-audit-rest.fullname" . }}-cert"
+  labels:
+    {{- include "kube-audit-rest.labels" . | nindent 4 }}
+webhooks:
+  - name: "{{ include "kube-audit-rest.fullname" . }}.{{ .Release.Namespace }}.svc"
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        name: "{{ include "kube-audit-rest.fullname" . }}"
+        namespace: "{{ .Release.Namespace }}"
+        path: "/log-request"
+        port: {{ .Values.service.port }}
+    rules:
+      - operations: [ "*" ]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["*/*"]
+        scope: "*"
+    failurePolicy: Ignore
+    sideEffects: None
+    timeoutSeconds: 1

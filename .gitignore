@@ -1,3 +1,4 @@
 tmp/*
-kube-audit-rest
+/kube-audit-rest
+/cmd/kube-audit-rest/kube-audit-rest
 .DS_Store
