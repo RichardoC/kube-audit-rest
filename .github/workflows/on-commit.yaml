@@ -23,23 +23,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # tag v5.0.0
         with:
           fetch-depth: 1
           fetch-tags: true
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v5.8.0
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # tag v5.8.0
         with:
           images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.6.0
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # tag v3.6.0
         with:
           platforms: 'arm64'
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # tag v3.11.1
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3.6.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # tag v3.6.0
         with:
           registry: ghcr.io
           # This is the user that triggered the Workflow. In this case, it will
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and push alpine based image
         id: alpine-image
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # tag v6.18.0
         with:
           file: Dockerfile-alpine
           context: .
@@ -70,14 +70,14 @@ jobs:
           sbom: true
       - name: Attest alpine based image
         id: attest-alpine
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # tag v3.0.0
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.alpine-image.outputs.digest }}
           push-to-registry: true
       - name: Build and push distroless image
         id: distroless-image
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # tag v6.18.0
         with:
           file: Dockerfile-distroless
           context: .
@@ -92,13 +92,13 @@ jobs:
           sbom: true
       - name: Attest distroless based image
         id: attest-distroless
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # tag v3.0.0
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.distroless-image.outputs.digest }}
           push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless AMD64 container
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless"
@@ -106,12 +106,12 @@ jobs:
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy distroless AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.30.9
+        uses: github/codeql-action/upload-sarif@16140ae1a102900babc80a33c44059580f687047 # tag v4.30.9
         with:
           sarif_file: 'distroless-results.sarif'
           category: 'trivy-distroless-AMD64'
       - name: Run Trivy vulnerability scanner for alpine container AMD64
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine'
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine"
@@ -119,7 +119,7 @@ jobs:
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy alpine AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.30.9
+        uses: github/codeql-action/upload-sarif@16140ae1a102900babc80a33c44059580f687047 # tag v4.30.9
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'trivy-alpine-AMD64-per-commit'

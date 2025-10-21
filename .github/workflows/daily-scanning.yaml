@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # tag v5.0.0
         with:
              fetch-depth: 0
       - name: Detect latest release
@@ -25,10 +25,10 @@ jobs:
           echo "latest_version=ghcr.io/richardoc/kube-audit-rest:$(git tag --sort=-version:refname | head -n1)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # tag v3.11.1
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # tag v3.6.0
         with:
           registry: ghcr.io
           # This is the user that triggered the Workflow. In this case, it will
@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           image-ref: '${{ steps.generate-container-name.outputs.latest_version }}-distroless'
           scan-ref: "daily scan - ${{ steps.generate-container-name.outputs.latest_version }}-distroless"
@@ -51,12 +51,12 @@ jobs:
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy distroless scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.30.9
+        uses: github/codeql-action/upload-sarif@16140ae1a102900babc80a33c44059580f687047 # tag v4.30.9
         with:
           sarif_file: 'distroless-results.sarif'
           category: 'daily-trivy-distroless-AMD64-release'
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           image-ref: '${{ steps.generate-container-name.outputs.latest_version }}-alpine'
           scan-ref: "daily scan - ${{ steps.generate-container-name.outputs.latest_version }}-alpine"
@@ -64,7 +64,7 @@ jobs:
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy alpine scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.30.9
+        uses: github/codeql-action/upload-sarif@16140ae1a102900babc80a33c44059580f687047 # tag v4.30.9
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'daily-trivy-alpine-AMD64-on-latest-release'
@@ -81,11 +81,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # tag v5.0.0
         with:
              fetch-depth: 0
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -93,13 +93,13 @@ jobs:
           output: 'repo-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy repo scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.30.9
+        uses: github/codeql-action/upload-sarif@16140ae1a102900babc80a33c44059580f687047 # tag v4.30.9
         with:
           sarif_file: 'repo-results.sarif'
           category: 'daily-trivy-repo'
 
       - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # tag 0.33.1
         with:
           scan-type: 'fs'
           format: 'github'
