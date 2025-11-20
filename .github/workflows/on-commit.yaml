@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # tag v5.0.0
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # tag v5.0.0
         with:
           fetch-depth: 1
           fetch-tags: true
