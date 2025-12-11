@@ -98,7 +98,7 @@ jobs:
       - name: Setup Action
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag v5.0.0
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@df65449f48b89ca7da6699b2d7620f4eaac2355b # tag 0.33.1
+        uses: aquasecurity/trivy-action@22438a435773de8c97dc0958cc0b823c45b064ac # tag 0.33.1
         with:
           scan-type: "fs"
           scan-ref: "."
