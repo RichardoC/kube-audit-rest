@@ -70,7 +70,7 @@ jobs:
           sbom: true
       - name: Attest alpine based image
         id: attest-alpine
-        uses: actions/attest-build-provenance@331a7ac6b7b893a9d009fe50d4e268b659c70ae5 # tag v3.0.0
+        uses: actions/attest-build-provenance@8835c60c52cafa2b7f8bd4fadd525d33bf16cefe # tag v3.0.0
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.alpine-image.outputs.digest }}
@@ -92,7 +92,7 @@ jobs:
           sbom: true
       - name: Attest distroless based image
         id: attest-distroless
-        uses: actions/attest-build-provenance@331a7ac6b7b893a9d009fe50d4e268b659c70ae5 # tag v3.0.0
+        uses: actions/attest-build-provenance@8835c60c52cafa2b7f8bd4fadd525d33bf16cefe # tag v3.0.0
         with:
           subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.distroless-image.outputs.digest }}
