@@ -51,7 +51,7 @@ jobs:
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy distroless scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@d0ad1da72a4017827f685ffa9a4e77661a852633 # tag v4.30.9
+        uses: github/codeql-action/upload-sarif@f67ec12472e1b361f5e1e2085f5e6f85a57e3cd6 # tag v4.30.9
         with:
           sarif_file: 'distroless-results.sarif'
           category: 'daily-trivy-distroless-AMD64-release'
@@ -64,7 +64,7 @@ jobs:
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy alpine scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@d0ad1da72a4017827f685ffa9a4e77661a852633 # tag v4.30.9
+        uses: github/codeql-action/upload-sarif@f67ec12472e1b361f5e1e2085f5e6f85a57e3cd6 # tag v4.30.9
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'daily-trivy-alpine-AMD64-on-latest-release'
@@ -93,7 +93,7 @@ jobs:
           output: 'repo-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy repo scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@d0ad1da72a4017827f685ffa9a4e77661a852633 # tag v4.30.9
+        uses: github/codeql-action/upload-sarif@f67ec12472e1b361f5e1e2085f5e6f85a57e3cd6 # tag v4.30.9
         with:
           sarif_file: 'repo-results.sarif'
           category: 'daily-trivy-repo'
