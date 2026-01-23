@@ -106,7 +106,7 @@ jobs:
           output: 'distroless-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy distroless AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@5e98e18a178e77b679ddf9a251beb8e3e9b232bf # tag v4.30.9
+        uses: github/codeql-action/upload-sarif@55252c7a3a47fea1e0fdd923b269f4be8a5ad9a0 # tag v4.30.9
         with:
           sarif_file: 'distroless-results.sarif'
           category: 'trivy-distroless-AMD64'
@@ -119,7 +119,7 @@ jobs:
           output: 'alpine-results.sarif'
           github-pat: '${{ secrets.GITHUB_TOKEN }}'
       - name: Upload Trivy alpine AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@5e98e18a178e77b679ddf9a251beb8e3e9b232bf # tag v4.30.9
+        uses: github/codeql-action/upload-sarif@55252c7a3a47fea1e0fdd923b269f4be8a5ad9a0 # tag v4.30.9
         with:
           sarif_file: 'alpine-results.sarif'
           category: 'trivy-alpine-AMD64-per-commit'
