@@ -25,7 +25,7 @@ jobs:
           echo "latest_version=ghcr.io/richardoc/kube-audit-rest:$(git tag --sort=-version:refname | head -n1)" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@c7c4c00f3eef127be487a50899a220e44c6bcc87 # tag v3.11.1
+        uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # tag v3.11.1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@2e1345c05f9563db17b704b7855578af55a6c8be # tag v3.6.0
