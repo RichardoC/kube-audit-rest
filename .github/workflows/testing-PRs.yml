@@ -84,7 +84,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@a5f9b05d2d216f63e13859e0d847461041025775 # tag v6.0.0
         with:
-          go-version: 1.25
+          go-version: 1.26
 
       - name: Build
         run: go build -v ./...
