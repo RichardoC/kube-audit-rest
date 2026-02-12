@@ -21,7 +21,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # tag v3.11.1
       - name: Build alpine based image
-        uses: docker/build-push-action@806c75105a1251cac8905df5dd4723b33174552c # tag v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # tag v6.18.0
         with:
           file: Dockerfile-alpine
           context: .
@@ -32,7 +32,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Build distroless image
-        uses: docker/build-push-action@806c75105a1251cac8905df5dd4723b33174552c # tag v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # tag v6.18.0
         with:
           file: Dockerfile-distroless
           context: .
@@ -52,7 +52,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@7c525be6cc8a882d5163ce04293cac18617c709f # tag v3.11.1
       - name: Build alpine based image
-        uses: docker/build-push-action@806c75105a1251cac8905df5dd4723b33174552c # tag v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # tag v6.18.0
         with:
           file: Dockerfile-alpine
           context: .
@@ -63,7 +63,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Build distroless image
-        uses: docker/build-push-action@806c75105a1251cac8905df5dd4723b33174552c # tag v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # tag v6.18.0
         with:
           file: Dockerfile-distroless
           context: .
