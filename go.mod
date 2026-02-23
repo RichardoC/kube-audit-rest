@@ -1,6 +1,6 @@
 module github.com/RichardoC/kube-audit-rest
 
-go 1.23.0
+go 1.26.0
 
 toolchain go1.26.0
 
