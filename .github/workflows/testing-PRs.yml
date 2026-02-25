@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98 # tag v5.0.0
 
       - name: Set up Go
-        uses: actions/setup-go@a5f9b05d2d216f63e13859e0d847461041025775 # tag v6.0.0
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # tag v6.0.0
         with:
           go-version: 1.26
 
