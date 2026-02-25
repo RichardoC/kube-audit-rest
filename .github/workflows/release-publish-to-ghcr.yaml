@@ -97,7 +97,7 @@ jobs:
           subject-digest: ${{ steps.distroless-image.outputs.digest }}
           push-to-registry: true
       - name: Run Trivy vulnerability scanner for distroless container
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # tag 0.33.1
+        uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e # tag 0.33.1
         with:
           image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-distroless"
@@ -110,7 +110,7 @@ jobs:
           sarif_file: "distroless-results.sarif"
           category: "trivy-distroless-AMD64-release"
       - name: Run Trivy vulnerability scanner for alpine container
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # tag 0.33.1
+        uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e # tag 0.33.1
         with:
           image-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
           scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.ref_name}}-alpine"
@@ -141,7 +141,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # tag 0.33.1
+        uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e # tag 0.33.1
         with:
           scan-type: "fs"
           scan-ref: "."
@@ -155,7 +155,7 @@ jobs:
           category: "trivy-repo-release"
 
       - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518 # tag 0.33.1
+        uses: aquasecurity/trivy-action@1bd062560b422f5944df1de50abd05162bea079e # tag 0.33.1
         with:
           scan-type: "fs"
           format: "github"
