@@ -53,7 +53,7 @@ jobs:
 
       - name: Build and push alpine based image
         id: alpine-image
-        uses: docker/build-push-action@9a57217389f1c89cb7c6bf96972f839d187aaf5b # tag v6.18.0
+        uses: docker/build-push-action@e25db879d025485a4eebd64fea9bb88a43632da6 # tag v6.18.0
         with:
           file: Dockerfile-alpine
           context: .
@@ -75,7 +75,7 @@ jobs:
           push-to-registry: true
       - name: Build and push distroless image
         id: distroless-image
-        uses: docker/build-push-action@9a57217389f1c89cb7c6bf96972f839d187aaf5b # tag v6.18.0
+        uses: docker/build-push-action@e25db879d025485a4eebd64fea9bb88a43632da6 # tag v6.18.0
         with:
           file: Dockerfile-distroless
           context: .
