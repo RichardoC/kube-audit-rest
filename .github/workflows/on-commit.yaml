@@ -39,7 +39,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8f54c6f8864eed1921d50086061f664945fcc305 # tag v3.11.1
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@db14339dbc0a1f0b184157be94b23a2138122354 # tag v3.6.0
+        uses: docker/login-action@9fe7774c8f8ebfade96f0a62aa10f3882309d517 # tag v3.6.0
         with:
           registry: ghcr.io
           # This is the user that triggered the Workflow. In this case, it will
