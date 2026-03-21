@@ -29,7 +29,7 @@ jobs:
           fetch-tags: true
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@d24d429af23073facc066506898a0eae1f24b9ad # tag v5.8.0
+        uses: docker/metadata-action@11079342065fb7d2c3b37cb799ab6ecc01ad1bb2 # tag v5.8.0
         with:
           images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
