@@ -31,7 +31,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@b99055d79363ee29ab720d5409f9c7007360c18b # tag v3.6.0
+        uses: docker/setup-qemu-action@6632d370eaa94c36e362c994b934b79877123e91 # tag v3.6.0
         with:
           platforms: "arm64"
       - name: Set up Docker Buildx
