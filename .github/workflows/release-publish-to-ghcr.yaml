@@ -11,8 +11,6 @@ jobs:
       # Grant the ability to write to GitHub Packages (push Docker images to
       # GitHub Container Registry).
       packages: write
-      # Needed to upload the code scanning results to code-scanning dashboard.
-      security-events: write
       # For uploading attestations
       attestations: write
       # For OICD?  https://github.com/actions/deploy-pages/issues/329
