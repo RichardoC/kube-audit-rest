@@ -3,7 +3,7 @@ name: Run per commit workflows
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   AMD64-build-and-publish-to-ghcr:
@@ -12,10 +12,8 @@ jobs:
       # Grant the ability to write to GitHub Packages (push Docker images to
       # GitHub Container Registry).
       packages: write
-      # Needed to upload the code scanning results to code-scanning dashboard.
-      security-events: write
       # For uploading attestations
-      attestations: write 
+      attestations: write
       # For OICD?  https://github.com/actions/deploy-pages/issues/329
       id-token: write
 
@@ -35,7 +33,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@6632d370eaa94c36e362c994b934b79877123e91 # tag v3.6.0
         with:
-          platforms: 'arm64'
+          platforms: "arm64"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d91f340399fb2345e3e45f5461e116862b08261d # tag v3.11.1
       - name: Login to GitHub Container Registry
@@ -97,68 +95,3 @@ jobs:
           subject-name: ghcr.io/richardoc/kube-audit-rest
           subject-digest: ${{ steps.distroless-image.outputs.digest }}
           push-to-registry: true
-      - name: Run Trivy vulnerability scanner for distroless AMD64 container
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # tag 0.33.1
-        with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless'
-          scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-distroless"
-          format: 'sarif'
-          output: 'distroless-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Upload Trivy distroless AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@72c0b0efb7def5141326c5e13760acdda431379d # tag v4.30.9
-        with:
-          sarif_file: 'distroless-results.sarif'
-          category: 'trivy-distroless-AMD64'
-      - name: Run Trivy vulnerability scanner for alpine container AMD64
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # tag 0.33.1
-        with:
-          image-ref: 'ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine'
-          scan-ref: "ghcr.io/richardoc/kube-audit-rest:${{github.sha}}-alpine"
-          format: 'sarif'
-          output: 'alpine-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Upload Trivy alpine AMD64 scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@72c0b0efb7def5141326c5e13760acdda431379d # tag v4.30.9
-        with:
-          sarif_file: 'alpine-results.sarif'
-          category: 'trivy-alpine-AMD64-per-commit'
-
-  static-scan-with-trivy:
-    # Explicitly grant the `secrets.GITHUB_TOKEN` permissions.
-    permissions:
-      # Grant the ability to write to GitHub Packages (push Docker images to
-      # GitHub Container Registry).
-      packages: write
-      # Needed to upload the code scanning results to code-scanning dashboard.
-      security-events: write
-      # Needed to upload dependency graph
-      contents: write
-
-    name: Run trivy on the repo
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v6.0.2
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'repo-results.sarif'
-          github-pat: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Upload Trivy repo scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4.34.1
-        with:
-          sarif_file: 'repo-results.sarif'
-          category: 'trivy-repo'
-
-      - name: Run Trivy in GitHub SBOM mode and submit results to Dependency Graph
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          format: 'github'
-          output: 'dependency-results.sbom.json'
-          image-ref: '.'
-          github-pat: ${{ secrets.GITHUB_TOKEN }}
