@@ -278,3 +278,7 @@ Some well behaved API clients will create a `SubjectAccessReview` before making 
 - have workflow to test that docker image can be created once a maintainer adds a label to the PR.
 - Make it clear this only tracks mutations due to limitations of the k8s api.
 - Show kube-audit-rest working with a full elastic stack
+
+## Links
+
+[![Hypercommit](https://img.shields.io/badge/Hypercommit-DB2475)](https://hypercommit.com/kube-audit-rest)
