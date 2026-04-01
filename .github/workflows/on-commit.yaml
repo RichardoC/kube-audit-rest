@@ -35,7 +35,7 @@ jobs:
         with:
           platforms: "arm64"
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@172dff065fb2e54aaed577fd667975cd412819fb # tag v3.11.1
+        uses: docker/setup-buildx-action@e35beed76f4e80e9b1116ca47dfa5939a88dd8ff # tag v3.11.1
       - name: Login to GitHub Container Registry
         uses: docker/login-action@de05a6d3a24346d4659bce540fac29c04a309bad # tag v3.6.0
         with:
