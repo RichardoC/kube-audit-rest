@@ -7,7 +7,7 @@ require (
 	github.com/prometheus/client_golang v1.25.0
 	github.com/stretchr/testify v1.12.1
 	github.com/thought-machine/go-flags v1.7.0
-	github.com/tidwall/gjson v1.20.2
+	github.com/tidwall/gjson v1.20.3
 	github.com/tidwall/sjson v1.2.9
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.28.0
