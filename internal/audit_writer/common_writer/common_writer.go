@@ -1,9 +1,7 @@
 package commonwriter
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
+	"encoding/json/jsontext"
 	"io"
 	"time"
 
@@ -19,11 +17,8 @@ func LogEvent(body []byte, writer io.Writer) {
 	}
 
 	// Compact the json for single line use regardless of request prettiness
-	dst := &bytes.Buffer{}
-	json.Compact(dst, []byte(updatedObj))
-
-	_, err = fmt.Fprintln(writer, dst)
-	if err != nil {
+	enc := jsontext.NewEncoder(writer, jsontext.AllowDuplicateNames(true))
+	if err := enc.WriteValue(jsontext.Value(updatedObj)); err != nil {
 		common.Logger.Error(err)
 	}
 }
