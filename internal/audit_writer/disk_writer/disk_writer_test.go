@@ -1,7 +1,7 @@
 package diskwriter_test
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"log"
 	"os"
 	"path"
@@ -27,6 +27,8 @@ func Test_WhenWritingEvent_ThenEventWritten(t *testing.T) {
 		log.Fatal(err)
 	}
 	var content map[string]string
-	json.Unmarshal(byteContent, &content)
+
+	err = json.Unmarshal(byteContent, &content)
+	assert.NoError(t, err)
 	assert.Equal(t, content["testEvent"], "test")
 }
